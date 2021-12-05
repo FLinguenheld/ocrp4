@@ -2,19 +2,21 @@
 
 class Base:
 
-    def __init__(self, name,):
+    def __init__(self, key, name,):
+        self.key = key
         self.name = name
 
     def __str__(self):
-        return f"Model base - name : {self.name}"
+        return f"Model base - key : {self.key} - name : {self.name}"
 
     def serialize(self):
-        return {"name" : self.name}
+        return {"key" : self.key, "name" : self.name}
     
     def unserialize(self, values):
+        self.key = values["key"]
         self.name = values["name"]
 
 if __name__ == "__main__":
 
-    my_model = Base("test")
+    my_model = Base(546, "test")
     print(my_model)

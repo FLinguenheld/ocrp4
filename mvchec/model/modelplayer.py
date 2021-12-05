@@ -4,8 +4,8 @@ from modelbase import Base
 
 class Player(Base):
 
-    def __init__(self, name="", last_name="", birth="", sex="", rank=0):
-        super().__init__(name)
+    def __init__(self, key=0, name="", last_name="", birth="", sex="", rank=0):
+        super().__init__(key, name)
         self.last_name = last_name
         self.birth = birth
         self.sex = sex
@@ -13,6 +13,7 @@ class Player(Base):
 
     def __str__(self):
         return f"""Joueur :
+        key : {self.key}
         prénom : {self.name}
         nom : {self.last_name}
         date de naissance : {self.birth}
@@ -30,13 +31,14 @@ class Player(Base):
         return dict_to_serialize
 
     def unserialize(self, values):
-        self.name = values["name"]
+        super().unserialize(values)
         self.last_name = values["last_name"]
         self.birth = values["birth"]
         self.sex = values["sex"]
         self.rank = values["rank"]
         
     def __eq__(self, other_player):
+        """ Compare all parts of two players without their keys """
         return (self.name == other_player.name
                 and self.last_name == other_player.last_name
                 and self.birth == other_player.birth
@@ -46,5 +48,5 @@ class Player(Base):
 
 if __name__ == "__main__":
 
-    my_model = Player("Jean", "Dupont", "1999-02-20", "Masculin", 12)
+    my_model = Player(54664, "Jean", "Dupont", "1999-02-20", "Masculin", 12)
     print(my_model)

@@ -56,6 +56,8 @@ class VMenu(VBase):
                     self._refresh()
                     print(f"Ce choix n'est pas possible")
 
+        return user_choices
+
     def _refresh(self):
         """ Clear the terminal, print titles and the menu """
         super().print_titles()

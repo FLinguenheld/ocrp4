@@ -1,0 +1,22 @@
+#! env/bin/python3
+
+from tinydb import TinyDB, Query
+from random import randint
+
+from controlbase import ControllerBase
+from view.viewform import FormatData
+
+class ControllerRound(ControllerBase):
+
+    def __init__(self):
+        super().__init__("rounds.json")
+
+    def create_round(self):
+        pass
+
+    def selection_round(self):
+        pass
+
+if __name__ == "__main__":
+    my_controler = ControllerRound()
+
