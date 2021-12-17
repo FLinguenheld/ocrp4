@@ -7,68 +7,54 @@ from controller.controlbase import ControllerBase
 from model.modelmatch import MMatch
 from model.modelplayer import MPlayer
 from database.datamatch import DMatch
+from view.viewbase import Title
 
 class ControllerMatch(ControllerBase):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, titles):
+        super().__init__(titles)
 
-    def set_winner(self, match_key):
+    def set_winner(self, match):
         """ Show a form to choice the winner
-            After user's choice, update the databases (database matchs and players) """
+            After user's choice, update the database
+            Return a dict with the player's key and the points to add """
 
-        my_match = self.database_match.get_object_by_key(match_key)
-        player1 = self.database_player.get_object_by_key(my_match.player_keys[0])
-        player2 = self.database_player.get_object_by_key(my_match.player_keys[1])
+        player1 = self.database_player.get_object_by_key(match.player_keys[0])
+        player2 = self.database_player.get_object_by_key(match.player_keys[1])
 
-        while True:
-            # Form
-            self.view_menu.update_subtitle(f"Selection du vainqueur")
-            my_demands = {1:f"{player1}", 2:f"{player2}", 'a':None, 3:"Égalité"}
-            winner_index = self.view_menu.show_menu(my_demands)
+        # Form
+        my_demands = {1:f"{player1}", 2:f"{player2}",
+                     'a':None,
+                      3:"Égalité",
+                     'b':None,
+                      4:"En cours"}
 
-            # Affect the winner
-            if winner_index == 1:
-                winner = player1
-            elif winner_index == 2:
-                winner = player2
-            else:
-                winner = None
+        winner_index = self.view_menu.show_menu(my_demands)
 
-            # Text for confirmation
-            if winner is not None:
-                txt_confirmation = f"Vainqueur : {winner}"
-            else:
-                txt_confirmation = "Égalité"
+        # Affect the winner
+        if winner_index == 1:
+            match.winner = player1.key
+        elif winner_index == 2:
+            match.winner = player2.key
+        elif winner_index == 3:
+            match.winner = 0 
+        else:
+            match.winner = None
 
-            # Ask a confirmation and update databases
-            if self.view_menu.ask_confirmation(txt_confirmation):
-
-                if winner is not None:
-                    my_match.winner = winner.key
-                    self._maj_rank(winner, 1)
-                else:
-                    my_match.winner = 0 
-                    self._maj_rank(player1, 0.5)
-                    self._maj_rank(player2, 0.5)
-
-                # Update database macth and leave
-                self.database_match.update_object(my_match)
-                break
-
-    def _maj_rank(self, player, value):
-        """ Add value to the player's points and update in database player """
-        player.points += value
-        self.database_player.update_object(player)
+        # Update database macth
+        self.database_match.update_object(match)
 
         
 if __name__ == "__main__":
-    my_controller = ControllerMatch()
 
-    my_match = MMatch(42861001, [66601745, 30498973])
+    my_titles = Title("Titre d'essai - control match")
+    my_titles.update_subtitle("Sous titre") 
+
+    my_controller = ControllerMatch(my_titles)
+
+    my_match = MMatch(42861001, [81059600, 27054088])
     database_match = DMatch()  
     database_match.add_object(my_match)
-    print(my_match)
 
-    my_controller.set_winner(my_match.key)
+    my_controller.set_winner(my_match)
 

@@ -3,19 +3,22 @@ from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
-from view.viewmenu import VMenu
 from view.viewform import VForm
 from view.viewform import FormatData
+from view.viewmenu import VMenu
 
 from database.dataplayer import DPlayer
 from database.datamatch import DMatch
 from database.datatournament import DTournament
 from database.dataround import DRound
-class ControllerBase:
+
+
+class ControllerMenuBase:
 
     def __init__(self, titles):
-        self.view_form = VForm(titles)
-        self.view_menu = VMenu(titles)
+        self.titles = titles
+        self.view_form = VForm(self.titles)
+        self.view_menu = VMenu(self.titles)
 
         self.database_player = DPlayer()
         self.database_match = DMatch()

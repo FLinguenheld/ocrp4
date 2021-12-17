@@ -1,15 +1,14 @@
 #! env/bin/python3
-
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
 from copy import deepcopy
 from view.viewbase import VBase
+from view.viewbase import Title
 
 class VMenu(VBase):
     """ This class allow to show a menu and wait a reponse from the user.
-        To change titles use direct access to "titles" or the method update_subtitle()
 
         Choices must be a dict() like this :
         (you can use a letter for key to create a space in menu - this line will be ignored)
@@ -21,8 +20,8 @@ class VMenu(VBase):
             3 - Choice 3
         …
     """
-    def __init__(self, titles, line_length=100):
-        super().__init__(titles, line_length)
+    def __init__(self, titles):
+        super().__init__(titles)
         self.menu = _Menu()
 
     def show_menu(self, choices, number_of_choices=1):
@@ -50,7 +49,7 @@ class VMenu(VBase):
                     if isinstance(current_choice, int) and current_choice in self.menu:
                         user_choices.append(current_choice)
 
-                        # Change the selected ke keyy in negative (it will print with an other style by _Menu)
+                        # Change the selected ke key in negative (it will print with an other style by _Menu)
                         self.menu.choices = {float(current_choice) if k == current_choice else k:v for k, v in self.menu.choices.items()}
                         self._refresh()
                         break
@@ -110,9 +109,10 @@ class _Menu:
 
 if __name__ == "__main__":
 
-    my_titles = ["Titre 1", "Titre 2", "Titre 3"]
+    my_titles = Title("Super titre !!!!!")
+    my_titles.update_subtitle("Sous titre encore mieux")
     my_choices = {1:"Choix 1", 2:"Choix 2", "a":None, 3:"Choix 3", "b":None, 4:"Choix 4"}
 
-    test = VMenu(my_titles, 50)
-    test.show_menu(my_choices, 3)
-
+    test = VMenu(my_titles)
+    user_choices = test.show_menu(my_choices, 3)
+    print(user_choices)

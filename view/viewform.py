@@ -8,6 +8,7 @@ from enum import Enum
 from datetime import datetime
 
 from view.viewbase import VBase
+from view.viewbase import Title
 
 
 class FormatData(Enum):
@@ -24,8 +25,8 @@ class FormatData(Enum):
 class VForm(VBase):
     """ Class to show and fill a form in the terminal """
 
-    def __init__(self, titles, line_length=100):
-        super().__init__(titles, line_length) 
+    def __init__(self, titles):
+        super().__init__(titles)
 
     def show_form(self, demands):
         """ Show the titles and the form and ask user for each line.
@@ -130,13 +131,15 @@ class VForm(VBase):
 
 
 if __name__ == "__main__":
-    my_titles = ["Titre 1", "Titre 2", "Titre 3"]
+
+    my_titles = Title("Super titre !!!!!")
+    my_titles.update_subtitle("Sous titre encore mieux")
     my_dem = {"name" : {"name" : "Nom", "format" : FormatData.STR},
               "nb_of_tooth" : {"name" : "Nombre de dents", "format" : FormatData.UINT},
               "nb_of_round" : {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : (2, 4, 8, 16, 20)},
               "birthday" : {"name" : "Date de naissance", "format" : FormatData.DATE},
               "sex" : {"name" : "Sexe", "format" : FormatData.LIST, "choices" : ("Masculin", "Féminin", "Autre")}}
 
-    my_form = VForm(my_titles, 60)
+    my_form = VForm(my_titles)
     my_form.show_form(my_dem)
 

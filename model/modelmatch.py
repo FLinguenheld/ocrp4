@@ -35,6 +35,10 @@ class MMatch(MBase):
         self.player_keys = values["player_keys"]
         self.winner = values["winner"]
 
+    def __eq__(self, other_match):
+        """ Compare the players of two matches """ 
+        return sorted(self.player_keys) == sorted(other_player.player_keys)
+
 
 if __name__ == "__main__":
     my_match = MMatch(2415, [1021, 98543])

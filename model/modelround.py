@@ -9,9 +9,9 @@ from model.modelbase import MBase
 
 class MRound(MBase):
 
-    def __init__(self, key=0, name="", matches_keys=[]):
+    def __init__(self, key=0, name="", match_keys=[]):
         super().__init__(key, name)
-        self.matches_keys = matches_keys
+        self.match_keys = match_keys
         self.datetime_start = None 
         self.datetime_end = None
 
@@ -36,10 +36,24 @@ class MRound(MBase):
         return f"Round:"\
                 f" key : {self.key}"\
                 f" name : {self.name}"\
-                f" matches_keys : {self.matches_keys}"\
+                f" match_keys : {self.match_keys}"\
                 f" datetime_start : {self.datetime_start}"\
                 f" datetime_end : {self.datetime_end}"
 
+    def serialize(self):
+        dict_to_serialize = super().serialize()
+        dict_to_serialize["match_keys"] = self.match_keys
+        dict_to_serialize["datetime_start"] = self.datetime_start
+        dict_to_serialize["datetime_end"] = self.datetime_end
+
+        return dict_to_serialize
+
+    def unserialize(self, values):
+        super().unserialize(values)
+        self.match_keys = values["match_keys"]
+        self.datetime_start = values["datetime_start"]
+        self.datetime_end = values["datetime_end"]
+     
 
 if __name__ == "__main__":
     my_round = MRound(25413, "Round 1", [20164, 3216])

@@ -20,8 +20,7 @@ class MPlayer(MBase):
         return f"{self.name} {self.last_name}"\
         f" né le {self.birth}"\
         f" - {self.sex}"\
-        f" - rang : {self.rank}"\
-        f" - points : {self.points}"
+        f" - rang : {self.rank}"
 
     def __repr__(self):
         return f"Player:"\
@@ -30,8 +29,7 @@ class MPlayer(MBase):
         f" nom : {self.last_name}"\
         f" date de naissance : {self.birth}"\
         f" sexe : {self.sex}"\
-        f" rang : {self.rank}"\
-        f" points : {self.points}"
+        f" rang : {self.rank}"
 
     def serialize(self):
         dict_to_serialize = super().serialize()
@@ -39,7 +37,6 @@ class MPlayer(MBase):
         dict_to_serialize["birth"] = self.birth
         dict_to_serialize["sex"] = self.sex
         dict_to_serialize["rank"] = self.rank
-        dict_to_serialize["points"] = self.points
 
         return dict_to_serialize
 
@@ -49,7 +46,6 @@ class MPlayer(MBase):
         self.birth = values["birth"]
         self.sex = values["sex"]
         self.rank = values["rank"]
-        self.points = values["points"]
         
     def __eq__(self, other_player):
         """ Compare all parts of two players without their keys """
@@ -61,5 +57,5 @@ class MPlayer(MBase):
 
 if __name__ == "__main__":
 
-    my_model = MPlayer(54664, "Jean", "Dupont", "1999-02-20", "Masculin", 12)
+    my_model = MPlayer(54664, "Jean", "Dupont", "1999-02-20", "Masculin", {105:1, 5:3})
     print(my_model)

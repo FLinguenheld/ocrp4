@@ -14,9 +14,9 @@ class DRound(DBase):
 
     def get_object_by_key(self, key):
         """ Return MRound object saved in the database with this key """
-        my_match = MMatch()
-        my_match.unserialize(super()._dict_by_key(key))
-        return my_match
+        my_round = MRound()
+        my_round.unserialize(super()._dict_by_key(key))
+        return my_round
 
 
 if __name__ == "__main__":
