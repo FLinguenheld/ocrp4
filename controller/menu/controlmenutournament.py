@@ -16,6 +16,8 @@ from model.modelplayer import MPlayer
 from database.dataplayer import DPlayer
 from view.viewbase import SubtitleLevel
 
+from database.datatournament import DTournament
+from database.dataround import DRound
 
 class ControllerMenuTournament(ControllerMenuBase):
 
@@ -25,31 +27,49 @@ class ControllerMenuTournament(ControllerMenuBase):
         self.controller_player = ControllerPlayer(self.titles)
         self.controller_round = ControllerRound(self.titles)
 
-    def show_tournament_in_progress(self, tournament):
+    def show_tournament_in_progress(self, tournament_key):
 
-        self.titles.update_subtitle(f"Tournoi {tournament.name}", SubtitleLevel.FIRST)
-        
+        my_tournament = DTournament().get_object_by_key(tournament_key)
+        self.titles.update_subtitle(f"Tournoi : {my_tournament.name}", SubtitleLevel.FIRST)
 
-        # Create the first round if needed
-        if not tournament.round_keys:
-            first_round = self.controller_round.create_round(tournament.players)
+        while True:
 
-            tournament.round_keys.append(first_round.key)
-            self.database_tournament.update_object(tournament)
+            # First round
+            if not my_tournament.round_keys:
+                self._new_round(my_tournament)
+            else:
+                last_round = DRound().get_object_by_key(my_tournament.round_keys[-1])
 
-        menu_round = ControllerMenuRound(self.titles, tournament.round_keys[-1], tournament.key)
-        menu_round.show_menu_round()
+                # Last round finished
+                if last_round.datetime_end != None:
 
+                    if len(my_tournament.round_keys) < my_tournament.number_of_rounds:
+                        self._new_round(my_tournament, my_tournament.round_keys)
+                    else:
+                        # Tournament finished
+                        my_tournament.ended = True
+                        DTournament.update_object(my_tournament)
+                        self.controller_tournament.abstract_tournament(my_tournament)
+                        return None
 
+            # Launch menu with last round
+            menu_round = ControllerMenuRound(self.titles, my_tournament.round_keys[-1], my_tournament.key)
+            menu_round.show_menu_round()
+
+    def _new_round(self, tournament, previous_rounds_keys=[]):
+        new_round = self.controller_round.create_round(tournament.players, previous_rounds_keys)
+
+        tournament.round_keys.append(new_round.key)
+        DTournament().update_object(tournament)
 
 
 
     def show_new_tournament(self):
-        self.view_menu.print_titles()
 
         # Enough players ?
         if len(self.database_player.get_all_objects([])) <= 8:
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
+            self.view_menu.print_titles()
             self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "\
                                        "pouvoir créer un nouveau tournoi.")
 
@@ -68,14 +88,14 @@ class ControllerMenuTournament(ControllerMenuBase):
             for p in player_keys:
                 my_tournament.players[p] = 0
 
-            self.database_tournament.update_object(my_tournament)
+            DTournament().update_object(my_tournament)
 
             # Launch the progress menu
-            self.show_tournament_in_progress(my_tournament)
+            self.show_tournament_in_progress(my_tournament.key)
 
 
     def show_resume_tournament(self):
-        tournaments = self.database_tournament.get_all_objects([])
+        tournaments = DTournament().get_all_objects([])
 
         # Search active tournaments
         tournaments_active = []
@@ -95,7 +115,7 @@ class ControllerMenuTournament(ControllerMenuBase):
                                     tournaments_active)
             
             # Launch the progress menu
-            self.show_tournament_in_progress(selected_tournament)
+            self.show_tournament_in_progress(selected_tournament.key)
 
 
 if __name__ == "__main__":

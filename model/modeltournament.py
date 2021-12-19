@@ -76,13 +76,13 @@ class MTournament(MBase):
             Because TinyDB use string in dict's keys """
         new_dict = {}
         for key, points in players_list.items():
-            new_dict[int(key)] = points
+            new_dict[int(key)] = float(points)
 
         return new_dict
 
     def __sort_dict(self, players_list):
         """ Sort players by points before save """
-        return dict(sorted(players_list.items(), key=lambda item:item[1]))
+        return dict(sorted(players_list.items(), key=lambda item:item[1], reverse=True))
 
 
 if __name__ == "__main__":

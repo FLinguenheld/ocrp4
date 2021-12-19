@@ -12,6 +12,7 @@ from database.datamatch import DMatch
 from database.datatournament import DTournament
 from database.dataround import DRound
 
+from controller.controltournament import ControllerTournament
 
 class ControllerMenuBase:
 
@@ -24,6 +25,8 @@ class ControllerMenuBase:
         self.database_match = DMatch()
         self.database_tournament = DTournament()
         self.database_round = DRound()
+
+        self.controller_tournament = ControllerTournament(self.titles)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ class MMatch(MBase):
 
     def __eq__(self, other_match):
         """ Compare the players of two matches """ 
-        return sorted(self.player_keys) == sorted(other_player.player_keys)
+        return sorted(self.player_keys) == sorted(other_match.player_keys)
 
 
 if __name__ == "__main__":

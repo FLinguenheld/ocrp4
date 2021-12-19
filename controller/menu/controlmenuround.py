@@ -5,13 +5,17 @@ path.insert(1, getcwd())
 
 
 from controller.menu.controlmenubase import ControllerMenuBase
+from controller.controltournament import ControllerTournament
 from controller.controlround import ControllerRound
 from view.viewbase import SubtitleLevel
 
 from controller.controlmatch import ControllerMatch
 
 
+from database.dataround import DRound
 from database.datamatch import DMatch
+from database.dataplayer import DPlayer
+from database.datatournament import DTournament
 
 
 class ControllerMenuRound(ControllerMenuBase):
@@ -25,19 +29,18 @@ class ControllerMenuRound(ControllerMenuBase):
 
     def show_menu_round(self):
     
-
         while True:
 
             self.titles.update_subtitle(f"{self.round.name} - {self.round.datetime_start}",
                                         SubtitleLevel.SECOND)
-            self.titles.update_subtitle(self._build_synopsis(),
+            self.titles.update_subtitle(self.controller_round.abstract_round(self.round),
                                         SubtitleLevel.THIRD)
             self.titles.clear_subtitle(SubtitleLevel.FOURTH)
 
             my_demands = {1:"Renseigner score",
                           2:"Valider round",
                          'a':None,
-                          3:"Afficher la liste des joueurs",
+                          3:"Afficher le classement en cours",
                          'b':None,
                           4:"Quitter"}
 
@@ -47,46 +50,62 @@ class ControllerMenuRound(ControllerMenuBase):
                 self._show_menu_scores()
 
             elif choice == 2:
-                pass
-
+                self._validate_round()
+                return None
 
             elif choice == 3:
-                self._show_players()
-
+                self.titles.update_subtitle("Classement en cours", SubtitleLevel.FOURTH)
+                self.view_menu.print_titles()
+                self.view_menu.print_text(
+                        self.controller_tournament.tournament_ranking(self.tournament))
 
             else:
                 return None
 
-    def _show_players(self):
-        
-        # Players list (already sort by model)
-        text = str()
-        for i, (key, points) in enumerate(self.tournament.players.items()):
-            if points > 1:
-                text += f"{i + 1} − {self._get_player_name(key)} - {points} points\n"
+
+    def _validate_round(self):
+
+        matches = DMatch().get_objects_by_keys(self.round.match_keys)
+
+        # Check if all matches are complete
+        for m in matches:
+            if m.winner == None:
+
+                self.titles.update_subtitle(f"Validation du round", SubtitleLevel.FOURTH)
+                self.view_menu.print_titles()
+                self.view_menu.print_text("Tous les matchs doivent être terminés "\
+                                          "pour pouvoir valider le round.")
+                return None
+
+        # If ok, add points in tournament
+        for m in DMatch().get_objects_by_keys(self.round.match_keys):
+
+            if m.winner == 0:
+                self.tournament.players[m.player_keys[0]] += 0.5
+                self.tournament.players[m.player_keys[1]] += 0.5
             else:
-                text += f"{i + 1} − {self._get_player_name(key)} - {points} point\n"
+                self.tournament.players[m.winner] += 1
 
-
-        self.titles.update_subtitle("Classement en cours", SubtitleLevel.FOURTH)
-        self.view_menu.print_titles()
-        self.view_menu.print_text(text)
+        DTournament().update_object(self.tournament)
+        
+        # Save the date of end
+        self.round.save_datetime_end()
+        DRound().update_object(self.round)
 
 
     def _show_menu_scores(self):
         """ Show matches and allow to select one to complete the winner """
         while True:
-            self._build_synopsis()
-            self.titles.update_subtitle(self._build_synopsis(),
+            self.titles.update_subtitle(self.controller_round.abstract_round(self.round),
                                         SubtitleLevel.THIRD)
-            self.titles.update_subtitle("Sélectionner un match pour indiquer le résultat",
+            self.titles.update_subtitle("Sélectionner un match pour modifier le résultat",
                                         SubtitleLevel.FOURTH)
 
-            matches = self.database_match.get_objects_by_keys(self.round.match_keys)
+            matches = DMatch().get_objects_by_keys(self.round.match_keys)
             my_demands = {}
             for i, m in enumerate(matches):
-                my_demands[i] = f"{self._get_player_name(m.player_keys[0])} - "\
-                                f"{self._get_player_name(m.player_keys[1])}"
+                my_demands[i] = f"{DPlayer().get_object_by_key(m.player_keys[0]).complete_name} - "\
+                                f"{DPlayer().get_object_by_key(m.player_keys[1]).complete_name}"
 
             my_demands['a'] = None
             my_demands[len(my_demands) - 1] = "Quitter"
@@ -101,38 +120,3 @@ class ControllerMenuRound(ControllerMenuBase):
             else:
                 return None
 
-
-    def _build_synopsis(self):
-        """ Refresh synopsis to show matchs list and winners
-            Return a text """
-        # Have to use a new DMatch because without, TinyDB return old datas
-        my_matches = DMatch().get_objects_by_keys(self.round.match_keys)
-
-        synopsis = "\n"
-        for m in my_matches:
-            synopsis += self._get_player_name(m.player_keys[0])
-            synopsis += " - "
-            synopsis += self._get_player_name(m.player_keys[1])
-
-            if m.winner is None:
-                synopsis += " - En cours\n"
-            elif m.winner == 0:
-                synopsis += " - Égalité\n"
-            else:
-                synopsis += f" - vainqueur : {self._get_player_name(m.winner)}\n"
-
-        return synopsis
-
-    def _get_player_name(self, player_key):
-        """ Return the player's name with a key """
-        player = self.database_player.get_object_by_key(player_key)
-        return f"{player.name} {player.last_name}"
-
-
-
-    def show_list_matchs(self):
-        pass
-
-
-    def show_select_winner(self):
-        pass

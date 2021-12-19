@@ -14,6 +14,7 @@ from database.dataround import DRound
 class ControllerBase:
 
     def __init__(self, titles):
+        self.titles = titles
         self.view_form = VForm(titles)
         self.view_menu = VMenu(titles)
 

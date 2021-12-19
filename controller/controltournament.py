@@ -4,12 +4,16 @@ from sys import path
 path.insert(1, getcwd())
 
 from controller.controlbase import ControllerBase
+from controller.controlround import ControllerRound
 from model.modeltournament import MTournament
 from database.datatournament import DTournament
+from database.dataplayer import DPlayer
+from database.dataround import DRound
 
 
 from view.viewform import FormatData
 from view.viewbase import Title
+from view.viewbase import SubtitleLevel
 
 
 class ControllerTournament(ControllerBase):
@@ -17,24 +21,72 @@ class ControllerTournament(ControllerBase):
     def __init__(self, titles):
         super().__init__(titles)
 
+        self.controller_round = ControllerRound(titles)
 
-    def resume_tournament(self, tournament):
+    def abstract_tournament(self, tournament):
 
-        round_in_progress = self._find_round_not_finished(tournament)
-
-
-        if round_in_progress == None:
-            pass
-
-            # Create a new round
-
-
-
+        self.titles.clear_subtitle(SubtitleLevel.ALL)
+        self.titles.update_subtitle(f"Tournoi : {tournament.name}", SubtitleLevel.FIRST)
+        
+        # --
+        if tournament.ended == False:
+            self.titles.update_subtitle("EN COURS", SubtitleLevel.SECOND)
         else:
-            pass
+            self.titles.update_subtitle("TERMINÉ", SubtitleLevel.SECOND)
+
+        # -−
+        text =  f"Du {tournament.date_start} au {tournament.date_end}\n"
+        text += f"Ville : {tournament.place}\n"
+        text += f"Nombre de rounds : {tournament.number_of_rounds}\n"
+        text += f"Contrôle du temps : {tournament.time_control}\n"
+        text += f"Description : {tournament.description}"
+        self.titles.update_subtitle(text, SubtitleLevel.THIRD)
+
+        # --
+        self.view_menu.print_titles()
+        self.view_menu.print_text("Classement :", ask_to_continue=False)
+        self.view_menu.print_text(self.tournament_ranking(tournament))
+        self.view_menu.print_separator()
+
+        # --
+        if tournament.round_keys:
+
+            for round_key in tournament.round_keys:
+                
+                my_round = DRound().get_object_by_key(round_key)
+                text = str()
+                text += f"{my_round.name}\n"
+                if my_round.datetime_end != None:
+                    text += f"{my_round.datetime_start} - {my_round.datetime_end}"
+                else:
+                    text += f"{my_round.datetime_start} - (round en cours)"
+
+                self.view_menu.print_text(text, ask_to_continue=False)
+                self.view_menu.print_text(self.controller_round.abstract_round(my_round))
+                self.view_menu.print_separator()
 
 
 
+    def tournament_ranking(self, tournament):
+        """ Return a text with the current ranking.
+            Players list is already sort by model """
+
+        text = str()
+        i = 1
+        previous_points = -1
+        for key, points in tournament.players.items():
+            player = DPlayer().get_object_by_key(key)
+            if points != previous_points:
+                if points > 1:
+                    text += f"{i} − {player.complete_name} - {points} points\n"
+                else:
+                    text += f"{i} − {player.complete_name} - {points} point\n"
+                i += 1
+                previous_points = points
+            else:
+                text += f"    {player.complete_name}\n"
+
+        return text
 
     def create_tournament(self):
         """ Create and show a form. User fill it and a new tournament is created in the data base

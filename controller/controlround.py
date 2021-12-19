@@ -5,6 +5,7 @@ path.insert(1, getcwd())
 
 from controller.controlbase import ControllerBase
 
+from database.datamatch import DMatch
 from database.dataplayer import DPlayer
 from view.viewbase import Title
 
@@ -17,9 +18,33 @@ class ControllerRound(ControllerBase):
         super().__init__(titles)
 
 
-    def create_round(self, players={}, previous_rounds=[]):
+    def abstract_round(self, my_round):
+        """ Build a text with the current results of
+            the matches saved in the round """
 
-        name = "Round " + str(len(previous_rounds) + 1)
+        my_matches = DMatch().get_objects_by_keys(my_round.match_keys)
+
+        abstract = "\n"
+        for m in my_matches:
+            abstract += DPlayer().get_object_by_key(m.player_keys[0]).complete_name
+            abstract += " - "
+            abstract += DPlayer().get_object_by_key(m.player_keys[1]).complete_name
+
+            if m.winner is None:
+                abstract += " - En cours\n"
+            elif m.winner == 0:
+                abstract += " - Égalité\n"
+            else:
+                abstract += f" - vainqueur : "\
+                            f"{DPlayer().get_object_by_key(m.player_keys[1]).complete_name}\n"
+
+        return abstract
+
+
+
+    def create_round(self, players={}, previous_rounds_keys=[]):
+
+        name = "Round " + str(len(previous_rounds_keys) + 1)
         print(name) 
 
         middle_index = len(players) // 2
@@ -37,7 +62,7 @@ class ControllerRound(ControllerBase):
                 new_match = MMatch(0, [p1.key, p2.key])
                 print(new_match)
 
-                if not self._check_match_already_played(new_match, previous_rounds):
+                if not self._check_match_already_played(new_match, previous_rounds_keys):
 
                     # Create the match, save in database and add in the list
                     new_match_key = self.database_match.add_object(new_match)
@@ -52,18 +77,18 @@ class ControllerRound(ControllerBase):
         return new_round
 
 
-    def _check_match_already_played(self, match, previous_rounds):
-        """ Get all matches in 'previous_rounds' and check if a match
+    def _check_match_already_played(self, match, previous_rounds_keys):
+        """ Get all matches in 'previous_rounds_keys' and check if a match
             with the sames players already exist"""
         # get the previous matches 
         previous_matches = []
-        for round_key in previous_rounds:
+        for round_key in previous_rounds_keys:
             my_round = self.database_round.get_object_by_key(round_key)
-            previous_matches.append(my_round.match_key)
+            previous_matches += my_round.match_keys
 
         # Check if the match was already played
         for match_key in previous_matches:
-            my_match = self.database_match.get_object_by_key(match_key)
+            my_match = DMatch().get_object_by_key(match_key)
             if my_match == match:
                 return True
 

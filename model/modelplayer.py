@@ -16,6 +16,10 @@ class MPlayer(MBase):
         self.rank = rank
         self.points = 0
 
+    @property
+    def complete_name(self):
+        return f"{self.name} {self.last_name}"
+
     def __str__(self):
         return f"{self.name} {self.last_name}"\
         f" né le {self.birth}"\
