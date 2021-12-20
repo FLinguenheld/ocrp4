@@ -1,29 +1,31 @@
 #! env/bin/python3
+""" Controller for tournament """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
 from controller.controlbase import ControllerBase
 from controller.controlround import ControllerRound
+
+from view.viewform import FormatData
+from view.viewbase import SubtitleLevel
+
 from model.modeltournament import MTournament
 from database.datatournament import DTournament
 from database.dataplayer import DPlayer
 from database.dataround import DRound
 
 
-from view.viewform import FormatData
-from view.viewbase import Title
-from view.viewbase import SubtitleLevel
-
-
 class ControllerTournament(ControllerBase):
+    """ Regroup main methods to manage model and database tournaments """
 
     def __init__(self, titles):
         super().__init__(titles)
-
         self.controller_round = ControllerRound(titles)
 
     def abstract_tournament(self, tournament):
+        """ Build a text with the current results of the tournament
+            saved in the database """
 
         self.titles.clear_subtitle(SubtitleLevel.ALL)
         self.titles.update_subtitle(f"Tournoi : {tournament.name}", SubtitleLevel.FIRST)
@@ -65,8 +67,6 @@ class ControllerTournament(ControllerBase):
                 self.view_menu.print_text(self.controller_round.abstract_round(my_round))
                 self.view_menu.print_separator()
 
-
-
     def tournament_ranking(self, tournament):
         """ Return a text with the current ranking.
             Players list is already sort by model """
@@ -86,7 +86,7 @@ class ControllerTournament(ControllerBase):
             else:
                 text += f"    {player.complete_name}\n"
 
-        return text
+        return text[:-1]
 
     def create_tournament(self):
         """ Create and show a form. User fill it and a new tournament is created in the data base
@@ -96,8 +96,10 @@ class ControllerTournament(ControllerBase):
                       "place" : {"name" : "Ville", "format" : FormatData.STR},
                       "date_start" : {"name" : "Date de début", "format" : FormatData.DATE},
                       "date_end" : {"name" : "Date de fin", "format" : FormatData.DATE},
-                      "number_of_rounds" : {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : [4]},
-                      "time_control" : {"name" : "Contrôle du temps", "format" : FormatData.LIST, "choices" : ("Bullet", "Blitz", "Coup rapide")},
+                      "number_of_rounds" : {"name" : "Nombre de rounds", "format" :
+                                                        FormatData.LISTINT, "choices" : [4]},
+                      "time_control" : {"name" : "Contrôle du temps", "format" :
+                            FormatData.LIST, "choices" : ("Bullet", "Blitz", "Coup rapide")},
                       "description" : {"name" : "Description", "format" : FormatData.STR}}
 
         while True:
@@ -113,10 +115,11 @@ class ControllerTournament(ControllerBase):
                              my_demands['description']['value'])
 
             self.view_form.print_titles(True)
-            if new_tournament in self.database_tournament.get_all_objects([]):
-                self.view_form.print_text(f"Le tournoi {new_tournament.name} de {new_tournament.place} exite déjà")
+            if new_tournament in DTournament().get_all_objects([]):
+                self.view_form.print_text(f"Le tournoi {new_tournament.name} de "\
+                                          f"{new_tournament.place} exite déjà")
             else:
-                self.database_tournament.add_object(new_tournament)
+                DTournament().add_object(new_tournament)
                 self.view_form.print_text(f"Nouveau tournoi ajouté :\n{new_tournament}")
                 return new_tournament
 
@@ -136,7 +139,7 @@ class ControllerTournament(ControllerBase):
     def list_tournament(self, sorted_by=["name"]):
         """ Show all tournaments sorted with the keys in 'sorted_by' """
 
-        tournaments = self.database_tournament.get_all_objects(sorted_by)
+        tournaments = DTournament().get_all_objects(sorted_by)
 
         text = str()
         for t in tournaments:
@@ -144,14 +147,4 @@ class ControllerTournament(ControllerBase):
 
         self.view_form.print_titles(True)
         self.view_form.print_text(text)
-
-
-if __name__ == "__main__":
-
-    my_titles = Title("Titre d'essai")
-    my_titles.update_subtitle("Sous titre d'essai aussi")
-    my_controler = ControllerTournament(my_titles)
-    #print(my_controler.selection_tournament())
-    my_controler.list_tournament()
-    #my_controler.create_tournament()
 

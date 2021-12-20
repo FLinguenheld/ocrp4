@@ -1,22 +1,25 @@
 #! env/bin/python3
+""" Controller for rounds """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
 from controller.controlbase import ControllerBase
-
-from database.datamatch import DMatch
-from database.dataplayer import DPlayer
 from view.viewbase import Title
 
-from model.modelmatch import MMatch
 from model.modelround import MRound
+from model.modelmatch import MMatch
+
+from database.dataround import DRound
+from database.datamatch import DMatch
+from database.dataplayer import DPlayer
+
 
 class ControllerRound(ControllerBase):
+    """ Regroup main methods to manage model and database rounds """
 
     def __init__(self, titles):
         super().__init__(titles)
-
 
     def abstract_round(self, my_round):
         """ Build a text with the current results of
@@ -31,26 +34,25 @@ class ControllerRound(ControllerBase):
             abstract += DPlayer().get_object_by_key(m.player_keys[1]).complete_name
 
             if m.winner is None:
-                abstract += " - En cours\n"
+                abstract += "  -  En cours\n"
             elif m.winner == 0:
-                abstract += " - Égalité\n"
+                abstract += "  -  Égalité\n"
             else:
-                abstract += f" - vainqueur : "\
-                            f"{DPlayer().get_object_by_key(m.player_keys[1]).complete_name}\n"
-
+                abstract += f"  -  vainqueur : "\
+                            f"{DPlayer().get_object_by_key(m.winner).complete_name}\n"
         return abstract
 
-
-
-    def create_round(self, players={}, previous_rounds_keys=[]):
+    def create_round(self, players_key_points={}, previous_rounds_keys=[]):
+        """ Create and save a round in the database
+            Manage the swiss system to create matches """
 
         name = "Round " + str(len(previous_rounds_keys) + 1)
-        print(name) 
+        
+        # Get MPlayers and sort players by points
+        middle_index = len(players_key_points) // 2
+        my_players = self._sort_players(players_key_points)
 
-        middle_index = len(players) // 2
-        my_players = self._sort_players(players)
-
-        print(middle_index)
+        # Cut in two lists
         first_list = my_players[:middle_index]
         second_list = my_players[middle_index:]
 
@@ -58,32 +60,35 @@ class ControllerRound(ControllerBase):
         match_keys = []
         for p1 in first_list:
 
+            # p1 with p2 exept is match already play with this two players
             for p2 in second_list:
                 new_match = MMatch(0, [p1.key, p2.key])
                 print(new_match)
 
+                # Already played ?
                 if not self._check_match_already_played(new_match, previous_rounds_keys):
 
                     # Create the match, save in database and add in the list
-                    new_match_key = self.database_match.add_object(new_match)
+                    new_match_key = DMatch().add_object(new_match)
                     match_keys.append(new_match_key)
+
                     second_list.remove(p2)
                     break
 
-        # Create round, save in database and return
+        # Create round, save in database and return the object
         new_round = MRound(0, name, match_keys)
         new_round.save_datetime_start()
-        self.database_round.add_object(new_round)
+        DRound().add_object(new_round)
         return new_round
-
 
     def _check_match_already_played(self, match, previous_rounds_keys):
         """ Get all matches in 'previous_rounds_keys' and check if a match
-            with the sames players already exist"""
+            with the sames players already exists """
+
         # get the previous matches 
         previous_matches = []
         for round_key in previous_rounds_keys:
-            my_round = self.database_round.get_object_by_key(round_key)
+            my_round = DRound().get_object_by_key(round_key)
             previous_matches += my_round.match_keys
 
         # Check if the match was already played
@@ -96,12 +101,12 @@ class ControllerRound(ControllerBase):
         return False
 
     def _sort_players(self, players):
-        # Transform the dict in players objects
-        # and add points
+        """ Get the MPlayers objects, save their points,
+            build a list and sort by rank then by points """
 
         my_players_list = []
         for key, points in players.items():
-            my_player = self.database_player.get_object_by_key(int(key))
+            my_player = DPlayer().get_object_by_key(int(key))
             my_player.points = points
 
             my_players_list.append(my_player)
@@ -109,7 +114,6 @@ class ControllerRound(ControllerBase):
         my_players_list.sort(key=lambda p:p.rank, reverse=True)
         my_players_list.sort(key=lambda p:p.points, reverse=True)
 
-        #print(my_players_list)
         return my_players_list
 
   

@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Database for tournaments """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
@@ -8,6 +9,8 @@ from model.modeltournament import MTournament
 
 
 class DTournament(DBase):
+    """ Database for tournaments, create the file and specialised class
+        for MTournament """
 
     def __init__(self):
         super().__init__("tournaments.json")

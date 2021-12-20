@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Main menu controller """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())

@@ -1,11 +1,14 @@
 #! env/bin/python3
+""" Allow to print titles, texts and a menu in the terminal """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
 from copy import deepcopy
 from view.viewbase import VBase
-from view.viewbase import Title
+from view.title import Title
+from view.title import _Line
+
 
 class VMenu(VBase):
     """ This class allow to show a menu and wait a reponse from the user.
@@ -22,7 +25,7 @@ class VMenu(VBase):
     """
     def __init__(self, titles):
         super().__init__(titles)
-        self.menu = _Menu()
+        self.menu = _Menu(titles.length, self.STARS_NUMBER)
 
     def show_menu(self, choices, number_of_choices=1):
         """ Show a menu, wait and return the user's choice (int).
@@ -40,17 +43,24 @@ class VMenu(VBase):
             while True:
                 try:
                     if number_of_choices == 1 :
-                        question = "Sélection ? > "
+                        question = self.line.formated_text_only_left_side(
+                                                        self.STARS_NUMBER,
+                                                        "Sélection ? > ")
                     else:
-                        question = f"Sélection {i}/{number_of_choices} ? > "
+                        question = self.line.formated_text_only_left_side(
+                                                        self.STARS_NUMBER,
+                                f"Sélection {i}/{number_of_choices} ? > ")
 
                     current_choice = int(input(question))
 
                     if isinstance(current_choice, int) and current_choice in self.menu:
                         user_choices.append(current_choice)
 
-                        # Change the selected ke key in negative (it will print with an other style by _Menu)
-                        self.menu.choices = {float(current_choice) if k == current_choice else k:v for k, v in self.menu.choices.items()}
+                        # Change the selected key in float 
+                        # (it will print with an other style by _Menu)
+                        self.menu.choices = {float(current_choice)
+                                                if k == current_choice
+                                                else k:v for k, v in self.menu.choices.items()}
                         self._refresh()
                         break
                     else:
@@ -60,7 +70,8 @@ class VMenu(VBase):
                     exit()
                 except:
                     self._refresh()
-                    print(f"Ce choix n'est pas possible")
+                    print(self.line.formated_text_only_left_side(self.STARS_NUMBER,
+                                                f"Ce choix n'est pas possible"))
 
         if number_of_choices == 1:
             return user_choices[0]
@@ -70,8 +81,9 @@ class VMenu(VBase):
     def _refresh(self):
         """ Clear the terminal, print titles and the menu """
         super().print_titles()
-        print(self.menu)
-
+        super().print_line_break()
+        self.menu.print()
+        super().print_line_break()
 
 class _Menu:
     """ Allow to create a menu in terminal.
@@ -82,23 +94,27 @@ class _Menu:
         and int are print normaly.
         See VMenu to read an exemple for the dictionary 'choices'
     """
-    def __init__(self):
+    def __init__(self, line_length, stars_number):
         self.choices = {}
+        self.line = _Line(line_length)
+        self.STARS_NUMBER = stars_number
 
     def update_choices(self, choices):
         """ Made a copy of choices, use this attribute to change int keys in float """
         self.choices = deepcopy(choices)
 
-    def __str__(self):
-        txt = str()
+    def print(self):
+        """ Print line by line the menu """
         for k, v in self.choices.items():
             if isinstance(k, int):
-                txt += f"   {k} : {v}\n"
+                print(self.line.format_text(self.STARS_NUMBER, f"{k} : {v}", False))
+
             elif isinstance(k, float):
-                txt += f"       -> {int(k)} : {v}\n"
+                txt = f"     -> {int(k)} : {v}"
+                print(self.line.format_text(self.STARS_NUMBER, f"     -> {int(k)} : {v}", False))
+
             else:
-                txt += "\n"
-        return txt
+                print(self.line.formated_jump(self.STARS_NUMBER))
 
     def __contains__(self, index):
         """ Allow to use = to check if index (int) exists in self.choices' keys

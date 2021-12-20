@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Database for players """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
@@ -8,6 +9,8 @@ from model.modelplayer import MPlayer
 
 
 class DPlayer(DBase):
+    """ Database for players, create the file and specialised class 
+        for MPlayer """
 
     def __init__(self):
         super().__init__("players.json")

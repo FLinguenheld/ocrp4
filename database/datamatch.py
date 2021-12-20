@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Database for matches """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
@@ -8,6 +9,8 @@ from model.modelmatch import MMatch
 
 
 class DMatch(DBase):
+    """ Database for matches, create the file and specialised
+        class for MMatch """
 
     def __init__(self):
         super().__init__("matchs.json")

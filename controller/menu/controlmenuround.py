@@ -1,16 +1,13 @@
 #! env/bin/python3
+""" Menu controller for rounds """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
-
 from controller.menu.controlmenubase import ControllerMenuBase
-from controller.controltournament import ControllerTournament
 from controller.controlround import ControllerRound
-from view.viewbase import SubtitleLevel
-
 from controller.controlmatch import ControllerMatch
-
+from view.viewbase import SubtitleLevel
 
 from database.dataround import DRound
 from database.datamatch import DMatch
@@ -19,16 +16,19 @@ from database.datatournament import DTournament
 
 
 class ControllerMenuRound(ControllerMenuBase):
+    """ Regroup menus to manage the rounds """
 
     def __init__(self, titles, round_key, tournament_key):
         super().__init__(titles)
         self.controller_round = ControllerRound(titles)
-        self.round = self.database_round.get_object_by_key(round_key)
-        self.tournament = self.database_tournament.get_object_by_key(tournament_key)
-
+        self.round = DRound().get_object_by_key(round_key)
+        self.tournament = DTournament().get_object_by_key(tournament_key)
 
     def show_menu_round(self):
-    
+        """ Show the menu of a round, allow to indicate score, validate round, and
+            show the classement. 
+            Subtitles are used to show the current matches results """    
+
         while True:
 
             self.titles.update_subtitle(f"{self.round.name} - {self.round.datetime_start}",
@@ -56,6 +56,7 @@ class ControllerMenuRound(ControllerMenuBase):
             elif choice == 3:
                 self.titles.update_subtitle("Classement en cours", SubtitleLevel.FOURTH)
                 self.view_menu.print_titles()
+                self.view_menu.print_line_break()
                 self.view_menu.print_text(
                         self.controller_tournament.tournament_ranking(self.tournament))
 
@@ -64,6 +65,8 @@ class ControllerMenuRound(ControllerMenuBase):
 
 
     def _validate_round(self):
+        """ Allow to validate round if matches are finished.
+            Update the round and the tournament and save in databases """
 
         matches = DMatch().get_objects_by_keys(self.round.match_keys)
 
@@ -73,6 +76,7 @@ class ControllerMenuRound(ControllerMenuBase):
 
                 self.titles.update_subtitle(f"Validation du round", SubtitleLevel.FOURTH)
                 self.view_menu.print_titles()
+                self.view_menu.print_line_break()
                 self.view_menu.print_text("Tous les matchs doivent être terminés "\
                                           "pour pouvoir valider le round.")
                 return None

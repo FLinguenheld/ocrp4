@@ -1,5 +1,5 @@
 #! env/bin/python3
-
+""" Base for datbases with TinyDB, regroups main attributes and methods """
 from os import getcwd
 from sys import path
 path.insert(0, getcwd())
@@ -11,6 +11,8 @@ from model.modelbase import MBase
 
 
 class DBase:
+    """ Mother's database's classes
+        Allow to save, search, create… """
 
     def __init__(self, database_name):
         self.data_base = TinyDB(database_name)

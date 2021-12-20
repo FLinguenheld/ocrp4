@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Model to represent a player """
 from os import getcwd
 from sys import path
 path.insert(1, getcwd())
@@ -14,6 +15,7 @@ class MPlayer(MBase):
         self.birth = birth
         self.sex = sex
         self.rank = rank
+        # Points is a temporary save
         self.points = 0
 
     @property

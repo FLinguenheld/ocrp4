@@ -1,4 +1,5 @@
 #! env/bin/python3
+""" Base for models, regroups main attributes and methods """
 
 class MBase:
 
