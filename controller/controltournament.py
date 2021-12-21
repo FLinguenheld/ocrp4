@@ -39,6 +39,7 @@ class ControllerTournament(ControllerBase):
         # -−
         text =  f"Du {tournament.date_start} au {tournament.date_end}\n"
         text += f"Ville : {tournament.place}\n"
+        text += f"Nombre de joueurs : {tournament.number_of_players}"
         text += f"Nombre de rounds : {tournament.number_of_rounds}\n"
         text += f"Contrôle du temps : {tournament.time_control}\n"
         text += f"Description : {tournament.description}"
@@ -120,8 +121,10 @@ class ControllerTournament(ControllerBase):
                 {"name" : "Date de début", "format" : FormatData.DATE},
                       "date_end" :
                 {"name" : "Date de fin", "format" : FormatData.DATE},
+                      "number_of_players" :
+                {"name" : "Nombre de joueurs", "format" : FormatData.LISTINT, "choices" : [8, 10]},
                       "number_of_rounds" :
-                {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : [4]},
+                {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : [4, 6]},
                       "time_control" :
                 {"name" : "Contrôle du temps", "format" : FormatData.LIST,
                                                "choices" : ("Bullet", "Blitz", "Coup rapide")},
@@ -136,6 +139,7 @@ class ControllerTournament(ControllerBase):
                              my_demands['place']['value'],
                              my_demands['date_start']['value'],
                              my_demands['date_end']['value'],
+                             my_demands['number_of_players']['value'],
                              my_demands['number_of_rounds']['value'],
                              my_demands['time_control']['value'],
                              my_demands['description']['value'])

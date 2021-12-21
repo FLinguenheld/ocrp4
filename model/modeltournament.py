@@ -12,11 +12,12 @@ from model.modelbase import MBase
 class MTournament(MBase):
 
     def __init__(self, key=0, name="", place="", date_start=None, date_end=None,
-                number_of_rounds=4, time_control="", description=""):
+                number_of_players=8, number_of_rounds=4, time_control="", description=""):
         super().__init__(key, name)
         self.place = place
         self.date_start = date_start 
         self.date_end = date_end
+        self.number_of_players = number_of_players
         self.number_of_rounds = number_of_rounds
         self.round_keys = []
         self.players = {}
@@ -54,6 +55,7 @@ class MTournament(MBase):
         dict_to_serialize["place"] = self.place
         dict_to_serialize["date_start"] = self.date_start
         dict_to_serialize["date_end"] = self.date_end
+        dict_to_serialize["number_of_players"] = self.number_of_players
         dict_to_serialize["number_of_rounds"] = self.number_of_rounds
         dict_to_serialize["round_keys"] = self.round_keys
         dict_to_serialize["players"] = self.__sort_dict(self.players)
@@ -68,6 +70,7 @@ class MTournament(MBase):
         self.place = values["place"]
         self.date_start = values["date_start"]
         self.date_end = values["date_end"]
+        self.number_of_players = values["number_of_players"]
         self.number_of_rounds = values["number_of_rounds"]
         self.round_keys = values["round_keys"]
         self.players = self.__convert_dict(values["players"])
@@ -82,6 +85,7 @@ class MTournament(MBase):
                 and self.place == other_tournament.place
                 and self.date_start == other_tournament.date_start
                 and self.date_end == other_tournament.date_end
+                and self.number_of_players == other_tournament.number_of_players
                 and self.number_of_rounds == other_tournament.number_of_rounds
                 and self.time_control == other_tournament.time_control)
 

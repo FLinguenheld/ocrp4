@@ -37,7 +37,7 @@ class ControllerMenuRound(ControllerMenuBase):
                                         SubtitleLevel.THIRD)
             self.titles.clear_subtitle(SubtitleLevel.FOURTH)
 
-            my_demands = {1:"Renseigner score",
+            my_demands = {1:"Renseigner résultat",
                           2:"Valider round",
                          'a':None,
                           3:"Afficher le classement en cours",

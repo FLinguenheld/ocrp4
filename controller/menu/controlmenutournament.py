@@ -90,7 +90,7 @@ class ControllerMenuTournament(ControllerMenuBase):
         """ Show menu to create a new tournament then launches the
             tournament in progress method """
 
-        # Enough players ?
+        # Enough players (eight today 21/12/2021) ?
         if len(DPlayer().get_all_objects()) <= 8:
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             self.view_menu.print_titles()
@@ -106,8 +106,9 @@ class ControllerMenuTournament(ControllerMenuBase):
 
             self.titles.update_subtitle(f"Création du tournoi : {my_tournament.name}",
                                         SubtitleLevel.FIRST)
-            self.titles.update_subtitle("Selectionner 8 joureurs", SubtitleLevel.SECOND)
-            player_keys = self.controller_player.selection_player(8)
+            self.titles.update_subtitle(f"Selectionner {my_tournament.number_of_players} joureurs",
+                                        SubtitleLevel.SECOND)
+            player_keys = self.controller_player.selection_player(my_tournament.number_of_players)
 
             # Save player keys and init their points {'player_key':points}
             for p in player_keys:

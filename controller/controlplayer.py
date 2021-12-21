@@ -101,7 +101,6 @@ class ControllerPlayer(ControllerBase):
         players.sort(key=attrgetter("rank"), reverse=True)
         players.sort(key=lambda k:k.name.lower(), reverse=False)
         players.sort(key=lambda k:k.last_name.lower(), reverse=False)
-        #players.sort(key=attrgetter("name", "last_name"))
 
         # Demands for the form
         my_demands = dict()
