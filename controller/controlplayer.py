@@ -20,33 +20,77 @@ class ControllerPlayer(ControllerBase):
         super().__init__(titles)
 
     def create_player(self):
-        """ Create and show a form. User fill it and a new player is created in the data base
-            Return the instance of the new player created """
+        """ Create a player in database.
+            Show a form and check if new player already exists. 
+            Then save in database and return the new player """
 
-        my_demands = {"name" : {"name" : "Prénom", "format" : FormatData.STR},
-                      "last_name" : {"name" : "Nom", "format" : FormatData.STR},
-                      "birthday" : {"name" : "Date de naissance", "format" :
-                                                                FormatData.DATE},
-                      "sex" : {"name" : "Sexe", "format" : FormatData.LIST,
-                                            "choices" : ("Masculin", "Féminin")}}
+        new_player = self._form_player()
+        DPlayer().add_object(new_player)
+
+        self.view_form.print_line_break()
+        self.view_form.print_text(f"Nouveau joueur ajouté :\n" \
+                                  f"  ** {new_player}")
+        return new_player
+
+    def update_player(self, player):
+        """ Update a player in the database.
+            Show a form and test if the updated player player exists.
+            Then update the database and return the updated player.
+            Attr 'player' is used to pre-fill the form """
+
+        updated_player = self._form_player(player)
+        DPlayer().update_object(updated_player)
+
+        self.view_form.print_line_break()
+        self.view_form.print_text(f"Le joueur :\n  ** {player}", ask_to_continue=False)
+        self.view_form.print_line_break()
+        self.view_form.print_text(f"a été remplacé par :\n  ** {updated_player}")
+        return updated_player
+
+    def _form_player(self, player=None):
+        """ Create a form and ask to user to fill it.
+            Check if new player already exists.
+            Give a player to pre-fill the form.
+            Return new player created """
 
         while True:
-            # Ask each demands by ViewForm then create a player with user's values
-            my_demands = self.view_form.show_form(my_demands)
-            new_player = MPlayer(0, my_demands['name']['value'],
-                                    my_demands['last_name']['value'],
-                                    my_demands['birthday']['value'],
-                                    my_demands['sex']['value'])
+            # Empty player if needed
+            if player is None:
+                player = MPlayer()
 
-            self.view_form.print_titles(True)
+            my_demands = {"name" :
+                                {"name" : "Prénom",
+                                 "format" : FormatData.STR,
+                                 "value" : player.name},
+                          "last_name" :
+                                {"name" : "Nom",
+                                 "format" : FormatData.STR,
+                                 "value" : player.last_name},
+                          "birth" :
+                                {"name" : "Date de naissance",
+                                 "format" : FormatData.DATE,
+                                 "value" : player.birth},
+                          "sex" :
+                                {"name" : "Sexe",
+                                 "format" : FormatData.LIST,
+                                 "choices" : ("Masculin", "Féminin"),
+                                 "value" : player.sex}}
+
+           # Show form and create a player with new values
+            my_demands = self.view_form.show_form(my_demands)
+            new_player = MPlayer(   player.key,
+                                    my_demands['name']['value'],
+                                    my_demands['last_name']['value'],
+                                    my_demands['birth']['value'],
+                                    my_demands['sex']['value'],
+                                    player.rank)
+
+            self.view_form.print_titles(clear_before=True)
             if new_player in DPlayer().get_all_objects():
-                self.view_form.print_text(f"Le joueur {new_player.name} "\
-                                          f"{new_player.last_name} exite déjà")
+                self.view_form.print_text(
+                                    f"Le joueur {new_player.complete_name} exite déjà")
             else:
-                DPlayer().add_object(new_player)
-                self.view_form.print_text(f"Nouveau joueur ajouté :\n{new_player}")
                 return new_player
-                break
 
     def selection_player(self, number=1):
         """ Show all players in database and allow to select one or several.
@@ -55,7 +99,9 @@ class ControllerPlayer(ControllerBase):
 
         players = DPlayer().get_all_objects()
         players.sort(key=attrgetter("rank"), reverse=True)
-        players.sort(key=attrgetter("name", "last_name"))
+        players.sort(key=lambda k:k.name.lower(), reverse=False)
+        players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+        #players.sort(key=attrgetter("name", "last_name"))
 
         # Demands for the form
         my_demands = dict()
@@ -74,5 +120,4 @@ class ControllerPlayer(ControllerBase):
                 players_selected_keys_in_db.append(players[i].key)
 
             return players_selected_keys_in_db
-
     

@@ -4,6 +4,8 @@ from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
+from datetime import date
+
 from model.modelbase import MBase
  
 
@@ -22,12 +24,22 @@ class MTournament(MBase):
         self.description = description
         self.ended = False
 
+    @property
+    def date(self):
+        """ Convert date_start in date object (to sort for exemple) """
+        my_date = self.date_start.split('/')
+        day = int(my_date[0])
+        month = int(my_date[1])
+        year = int(my_date[2])
+        
+        return date(year, month, day)
+
+
     def __str__(self):
         return f"{self.name}"\
         f" de {self.place}"\
-        f" du {self.date_start}"\
-        f" au {self.date_end}"\
-        f" - {self.description}"
+        f" - du {self.date_start}"\
+        f" au {self.date_end}"
 
     def __repr__(self):
         return f"Tournoi :"\

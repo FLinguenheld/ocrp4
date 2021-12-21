@@ -60,7 +60,9 @@ class VBase:
 
         if ask_to_continue:
             self.print_line_break()
-            input("**     Appuyez sur une touche pour continuer...")
+            input(self.line.formated_text_only_left_side(self.STARS_NUMBER,
+                                        "Appuyez sur une touche pour continuer..."))
+            #input("**     Appuyez sur une touche pour continuer...")
 
     def clear_terminal(self):
         """ Clear the terminal """

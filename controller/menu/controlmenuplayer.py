@@ -29,65 +29,91 @@ class ControllerMenuPlayer(ControllerMenuBase):
             self.titles.update_subtitle("Gestion des joueurs", SubtitleLevel.FIRST)
 
             my_demands = {1:"Nouveau joueur",
-                          2:"Mettre à jour le classement ELO",
+                          2:"Modifier joueur",
+                          3:"Mettre à jour le classement ELO",
                          'a':None,
-                          3:"Liste des joueurs par classement",
-                          4:"Liste des joueurs par nom",
-                          5:"Liste des joueurs par prénom",
+                          4:"Liste des joueurs par classement",
+                          5:"Liste des joueurs par nom",
+                          6:"Liste des joueurs par prénom",
                          'b':None,
-                          6:"Quitter"}
+                          7:"Quitter"}
 
             choice = self.view_menu.show_menu(my_demands)
 
             if choice == 1:
                 self.titles.update_subtitle("Création d'un nouveau joueur",
                                             SubtitleLevel.SECOND)
+
                 self.controller_player.create_player()
 
-            elif choice == 2:
-                self._update_elo()
+            if choice == 2:
+                if self._check_if_players():
+                    self.titles.update_subtitle("Modification d'un joueur",
+                                                SubtitleLevel.SECOND)
+
+                    # Select a player
+                    player_key = self.controller_player.selection_player(number=1)
+                    selected_player = DPlayer().get_object_by_key(player_key)
+
+                    # Update
+                    self.controller_player.update_player(selected_player)
 
             elif choice == 3:
-                self.titles.update_subtitle("Liste des joueurs par classement",
-                                            SubtitleLevel.SECOND)
-
-                players = DPlayer().get_all_objects()
-                players.sort(key=attrgetter("name", "last_name"))
-                players.sort(key=attrgetter("rank"), reverse=True)
-
-                self._show_list(players)
+                if self._check_if_players():
+                    self.titles.update_subtitle("Modification du classement ELO",
+                                                SubtitleLevel.SECOND)
+                    self._update_elo()
 
             elif choice == 4:
-                self.titles.update_subtitle("Liste des joueurs par nom",
-                                            SubtitleLevel.SECOND)
+                if self._check_if_players():
+                    self.titles.update_subtitle("Liste des joueurs par classement",
+                                                SubtitleLevel.SECOND)
 
-                players = DPlayer().get_all_objects()
-                players.sort(key=attrgetter("rank"), reverse=True)
-                players.sort(key=attrgetter("last_name", "name"))
+                    players = DPlayer().get_all_objects()
+                    players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+                    players.sort(key=lambda k:k.name.lower(), reverse=False)
+                    players.sort(key=attrgetter("rank"), reverse=True)
 
-                self._show_list(players)
+                    self._show_list(players)
 
             elif choice == 5:
-                self.titles.update_subtitle("Liste des joueurs par prénom",
-                                            SubtitleLevel.SECOND)
+                if self._check_if_players():
+                    self.titles.update_subtitle("Liste des joueurs par nom",
+                                                SubtitleLevel.SECOND)
 
-                players = DPlayer().get_all_objects()
-                players.sort(key=attrgetter("rank"), reverse=True)
-                players.sort(key=attrgetter("name", "last_name"))
+                    players = DPlayer().get_all_objects()
+                    players.sort(key=attrgetter("rank"), reverse=True)
+                    players.sort(key=lambda k:k.name.lower(), reverse=False)
+                    players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+     
+                    self._show_list(players)
 
-                self._show_list(players)
+            elif choice == 6:
+                if self._check_if_players():
+                    self.titles.update_subtitle("Liste des joueurs par prénom",
+                                                SubtitleLevel.SECOND)
+
+                    players = DPlayer().get_all_objects()
+                    players.sort(key=attrgetter("rank"), reverse=True)
+                    players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+                    players.sort(key=lambda k:k.name.lower(), reverse=False)
+
+                    self._show_list(players)
 
             else:
                 return None
 
     def _show_list(self, players):
         """ Print titles and list given """
-        text = "\n"
-        for p in players:
-            text += f" - {p}\n"
 
         self.view_form.print_titles(True)
-        self.view_form.print_text(text)
+        self.view_form.print_line_break()
+
+        text = str()
+        for p in players:
+            text += f"{p}\n"
+
+        self.view_form.print_text(text, ask_to_continue=True, center=True)
 
     def _update_elo(self):
         
@@ -104,6 +130,17 @@ class ControllerMenuPlayer(ControllerMenuBase):
         # Update player and save
         player.rank = my_demand["elo"]["value"]
         DPlayer().update_object(player)
+    
+    def _check_if_players(self):
+        """ Check if there is at least one player in database.
+            Otherwise, show a message."""
 
-
+        if DPlayer().get_all_objects():
+            return True
+        else:
+            self.titles.update_subtitle("Aucun joueur existant", SubtitleLevel.SECOND)
+            self.view_menu.print_titles()
+            self.view_menu.print_line_break()
+            self.view_menu.print_text("Aucune donnée à afficher")
+            return False
 

@@ -80,9 +80,11 @@ class ControllerMenuTournament(ControllerMenuBase):
         DTournament().update_object(tournament)
 
         # Show a text to make a transition
+        self.titles.clear_subtitle(SubtitleLevel.SECOND)
+        self.titles.clear_subtitle(SubtitleLevel.THIRD)
         self.view_menu.print_titles()
         self.view_menu.print_line_break()
-        self.view_menu.print_text(f"Création du round : ** {new_round.name} **")
+        self.view_menu.print_text(f"Création du round : ** {new_round.name} **", center=True)
 
     def show_new_tournament(self):
         """ Show menu to create a new tournament then launches the
@@ -92,6 +94,7 @@ class ControllerMenuTournament(ControllerMenuBase):
         if len(DPlayer().get_all_objects()) <= 8:
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             self.view_menu.print_titles()
+            self.view_menu.print_line_break()
             self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "\
                                        "pouvoir créer un nouveau tournoi.")
             return None
@@ -119,7 +122,6 @@ class ControllerMenuTournament(ControllerMenuBase):
         """ Search active tournaments and allow to select one.
             After the user choice, launches the tournament in progress method """
         tournaments = DTournament().get_all_objects()
-        tournaments.sort(key=attrgetter("date_start"), reverse=True)
 
         # Search active tournaments
         tournaments_active = []
@@ -129,12 +131,15 @@ class ControllerMenuTournament(ControllerMenuBase):
 
         if not tournaments_active:
             self.view_menu.print_titles()
+            self.view_menu.print_line_break()
             self.view_menu.print_text("Aucun tournoi en cours.")
         else:
             self.titles.update_subtitle("Selectionner le tournoi à reprendre",
                                         SubtitleLevel.SECOND)
             self.view_menu.print_titles()
 
+            # Sort by date and ask selection
+            tournaments_active.sort(key=attrgetter("date"), reverse=True)
             selected_tournament = self.controller_tournament.selection_tournament(
                                     tournaments_active)
             

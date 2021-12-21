@@ -7,6 +7,7 @@ path.insert(1, getcwd())
 from controller.menu.controlmenubase import ControllerMenuBase 
 from controller.menu.controlmenutournament import ControllerMenuTournament 
 from controller.menu.controlmenuplayer import ControllerMenuPlayer
+from controller.menu.controlmenuhistory import ControllerMenuHistory
 
 from view.viewbase import Title
 from view.viewbase import SubtitleLevel
@@ -18,6 +19,7 @@ class ControllerMenuMain(ControllerMenuBase):
         super().__init__(titles)
         self.menu_tournament = ControllerMenuTournament(titles)
         self.menu_player = ControllerMenuPlayer(titles)
+        self.menu_history = ControllerMenuHistory(titles)
 
     def show(self):
         
@@ -52,10 +54,11 @@ class ControllerMenuMain(ControllerMenuBase):
                 self.menu_player.show_menu_player()
 
             elif choice == 4:
-                pass
-                
+                self.menu_history.show_menu()
+
             else:
                 exit()
+
 
 if __name__ == "__main__":
 

@@ -4,8 +4,6 @@ from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
-from operator import attrgetter
-
 from controller.controlbase import ControllerBase
 from controller.controlround import ControllerRound
 
@@ -80,11 +78,12 @@ class ControllerTournament(ControllerBase):
         for k in tournament.players.keys():
             players.append(DPlayer().get_object_by_key(k))
 
-        players.sort(key=attrgetter("name", "last_name"))
+        players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+        players.sort(key=lambda k:k.name.lower(), reverse=False)
 
         txt = str()
         for p in players:
-            txt += f"{p.complete_name}\n"
+            txt += f"{p.complete_name} - ({p.rank})\n"
 
         return txt
 
@@ -113,15 +112,21 @@ class ControllerTournament(ControllerBase):
         """ Create and show a form. User fill it and a new tournament is created in the data base
             Return the instance of the new object created """
 
-        my_demands = {"name" : {"name" : "Nom du tournoi", "format" : FormatData.STR},
-                      "place" : {"name" : "Ville", "format" : FormatData.STR},
-                      "date_start" : {"name" : "Date de début", "format" : FormatData.DATE},
-                      "date_end" : {"name" : "Date de fin", "format" : FormatData.DATE},
-                      "number_of_rounds" : {"name" : "Nombre de rounds", "format" :
-                                                        FormatData.LISTINT, "choices" : [4]},
-                      "time_control" : {"name" : "Contrôle du temps", "format" :
-                            FormatData.LIST, "choices" : ("Bullet", "Blitz", "Coup rapide")},
-                      "description" : {"name" : "Description", "format" : FormatData.STR}}
+        my_demands = {"name" :
+                {"name" : "Nom du tournoi", "format" : FormatData.STR},
+                      "place" :
+                {"name" : "Ville", "format" : FormatData.STR},
+                      "date_start" :
+                {"name" : "Date de début", "format" : FormatData.DATE},
+                      "date_end" :
+                {"name" : "Date de fin", "format" : FormatData.DATE},
+                      "number_of_rounds" :
+                {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : [4]},
+                      "time_control" :
+                {"name" : "Contrôle du temps", "format" : FormatData.LIST,
+                                               "choices" : ("Bullet", "Blitz", "Coup rapide")},
+                      "description" :
+                {"name" : "Description", "format" : FormatData.STR}}
 
         while True:
             # Ask each demands by ViewForm then create a tournament with user's values
