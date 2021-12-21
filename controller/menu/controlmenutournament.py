@@ -4,6 +4,8 @@ from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
+from operator import attrgetter
+
 from controller.menu.controlmenubase import ControllerMenuBase
 from controller.menu.controlmenuround import ControllerMenuRound
 
@@ -29,14 +31,15 @@ class ControllerMenuTournament(ControllerMenuBase):
         self.controller_tournament = ControllerTournament(self.titles)
         self.controller_player = ControllerPlayer(self.titles)
         self.controller_round = ControllerRound(self.titles)
+        self.menu_round = ControllerMenuRound(self.titles)
 
     def show_tournament_in_progress(self, tournament_key):
         """ Main method, resume and manages the tournament, creates rounds and launches menus """
-
-        my_tournament = DTournament().get_object_by_key(tournament_key)
-        self.titles.update_subtitle(f"Tournoi : {my_tournament.name}", SubtitleLevel.FIRST)
-
+        
         while True:
+            # here to refresh the object
+            my_tournament = DTournament().get_object_by_key(tournament_key)
+            self.titles.update_subtitle(f"Tournoi : {my_tournament.name}", SubtitleLevel.FIRST)
 
             # First round
             if not my_tournament.round_keys:
@@ -51,16 +54,20 @@ class ControllerMenuTournament(ControllerMenuBase):
                         self._new_round(my_tournament, my_tournament.round_keys)
                     else:
                         # Tournament finished
+                        # Show a text to make a transition
+                        self.view_menu.print_titles()
+                        self.view_menu.print_text(f"Tounoi ** {my_tournament.name} ** terminé !")
+
+                        # Save and show abstract
                         my_tournament.ended = True
                         DTournament().update_object(my_tournament)
                         self.controller_tournament.abstract_tournament(my_tournament)
                         return None
 
             # Launch menu with last round
-            menu_round = ControllerMenuRound(self.titles,
-                                             my_tournament.round_keys[-1],
-                                             my_tournament.key)
-            menu_round.show_menu_round()
+            if self.menu_round.show_menu_round(my_tournament.round_keys[-1],
+                                               my_tournament.key) == "Quit":
+                return None
 
     def _new_round(self, tournament, previous_rounds_keys=[]):
         """ Private, create a new round with the controller round and
@@ -72,12 +79,17 @@ class ControllerMenuTournament(ControllerMenuBase):
         tournament.round_keys.append(new_round.key)
         DTournament().update_object(tournament)
 
+        # Show a text to make a transition
+        self.view_menu.print_titles()
+        self.view_menu.print_line_break()
+        self.view_menu.print_text(f"Création du round : ** {new_round.name} **")
+
     def show_new_tournament(self):
         """ Show menu to create a new tournament then launches the
             tournament in progress method """
 
         # Enough players ?
-        if len(DPlayer().get_all_objects([])) <= 8:
+        if len(DPlayer().get_all_objects()) <= 8:
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             self.view_menu.print_titles()
             self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "\
@@ -106,7 +118,8 @@ class ControllerMenuTournament(ControllerMenuBase):
     def show_resume_tournament(self):
         """ Search active tournaments and allow to select one.
             After the user choice, launches the tournament in progress method """
-        tournaments = DTournament().get_all_objects([])
+        tournaments = DTournament().get_all_objects()
+        tournaments.sort(key=attrgetter("date_start"), reverse=True)
 
         # Search active tournaments
         tournaments_active = []

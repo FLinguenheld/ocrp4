@@ -47,17 +47,6 @@ class DBase:
         if results:
             return results[0]
 
-    def _all_dicts(self, sort_keys):
-        """ Return a list with all data base dictionaries sorted with the list sort_keys
-            ex : ['name', 'last_name', 'rank', …]"""
-        elements = self.data_base.all()
-        if sort_keys:
-            for k in sort_keys:
-                elements = sorted(elements, key=lambda d:d[k])
-
-        return elements
-
-
 if __name__ == "__main__":
     pass
 

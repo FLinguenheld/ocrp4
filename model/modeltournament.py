@@ -64,7 +64,8 @@ class MTournament(MBase):
         self.ended = values["ended"]
 
     def __eq__(self, other_tournament):
-        """ Compare two tournaments (name/place/date_start/date_end/number_of_rounds/time_control) """
+        """ Compare two tournaments
+            (name/place/date_start/date_end/number_of_rounds/time_control) """
         return (self.name == other_tournament.place
                 and self.place == other_tournament.place
                 and self.date_start == other_tournament.date_start

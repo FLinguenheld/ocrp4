@@ -18,22 +18,22 @@ from database.datatournament import DTournament
 class ControllerMenuRound(ControllerMenuBase):
     """ Regroup menus to manage the rounds """
 
-    def __init__(self, titles, round_key, tournament_key):
+    def __init__(self, titles):
         super().__init__(titles)
         self.controller_round = ControllerRound(titles)
-        self.round = DRound().get_object_by_key(round_key)
-        self.tournament = DTournament().get_object_by_key(tournament_key)
 
-    def show_menu_round(self):
+    def show_menu_round(self, round_key, tournament_key):
         """ Show the menu of a round, allow to indicate score, validate round, and
             show the classement. 
             Subtitles are used to show the current matches results """    
 
         while True:
+            my_tournament = DTournament().get_object_by_key(tournament_key)
+            my_round = DRound().get_object_by_key(round_key)
 
-            self.titles.update_subtitle(f"{self.round.name} - {self.round.datetime_start}",
+            self.titles.update_subtitle(f"{my_round.name} - {my_round.datetime_start}",
                                         SubtitleLevel.SECOND)
-            self.titles.update_subtitle(self.controller_round.abstract_round(self.round),
+            self.titles.update_subtitle(self.controller_round.abstract_round(my_round),
                                         SubtitleLevel.THIRD)
             self.titles.clear_subtitle(SubtitleLevel.FOURTH)
 
@@ -41,16 +41,17 @@ class ControllerMenuRound(ControllerMenuBase):
                           2:"Valider round",
                          'a':None,
                           3:"Afficher le classement en cours",
+                          4:"Afficher l'historique du tournoi",
                          'b':None,
-                          4:"Quitter"}
+                          5:"Quitter"}
 
             choice = self.view_menu.show_menu(my_demands)
 
             if choice == 1:
-                self._show_menu_scores()
+                self._show_menu_scores(round_key)
 
             elif choice == 2:
-                self._validate_round()
+                self._validate_round(round_key, tournament_key)
                 return None
 
             elif choice == 3:
@@ -58,17 +59,21 @@ class ControllerMenuRound(ControllerMenuBase):
                 self.view_menu.print_titles()
                 self.view_menu.print_line_break()
                 self.view_menu.print_text(
-                        self.controller_tournament.tournament_ranking(self.tournament))
+                        self.controller_tournament.tournament_ranking(my_tournament))
+
+            elif choice == 4:
+                self.controller_tournament.abstract_tournament(my_tournament)
 
             else:
-                return None
+                return "Quit"
 
 
-    def _validate_round(self):
+    def _validate_round(self, round_key, tournament_key):
         """ Allow to validate round if matches are finished.
             Update the round and the tournament and save in databases """
 
-        matches = DMatch().get_objects_by_keys(self.round.match_keys)
+        my_round = DRound().get_object_by_key(round_key)
+        matches = DMatch().get_objects_by_keys(my_round.match_keys)
 
         # Check if all matches are complete
         for m in matches:
@@ -82,30 +87,33 @@ class ControllerMenuRound(ControllerMenuBase):
                 return None
 
         # If ok, add points in tournament
-        for m in DMatch().get_objects_by_keys(self.round.match_keys):
+        my_tournament = DTournament().get_object_by_key(tournament_key)
+        for m in DMatch().get_objects_by_keys(my_round.match_keys):
 
             if m.winner == 0:
-                self.tournament.players[m.player_keys[0]] += 0.5
-                self.tournament.players[m.player_keys[1]] += 0.5
+                my_tournament.players[m.player_keys[0]] += 0.5
+                my_tournament.players[m.player_keys[1]] += 0.5
             else:
-                self.tournament.players[m.winner] += 1
+                my_tournament.players[m.winner] += 1
 
-        DTournament().update_object(self.tournament)
-        
+        DTournament().update_object(my_tournament)
+
         # Save the date of end
-        self.round.save_datetime_end()
-        DRound().update_object(self.round)
+        my_round.save_datetime_end()
+        DRound().update_object(my_round)
 
 
-    def _show_menu_scores(self):
+    def _show_menu_scores(self, round_key):
         """ Show matches and allow to select one to complete the winner """
         while True:
-            self.titles.update_subtitle(self.controller_round.abstract_round(self.round),
+            my_round = DRound().get_object_by_key(round_key)
+            
+            self.titles.update_subtitle(self.controller_round.abstract_round(my_round),
                                         SubtitleLevel.THIRD)
             self.titles.update_subtitle("Sélectionner un match pour modifier le résultat",
                                         SubtitleLevel.FOURTH)
 
-            matches = DMatch().get_objects_by_keys(self.round.match_keys)
+            matches = DMatch().get_objects_by_keys(my_round.match_keys)
             my_demands = {}
             for i, m in enumerate(matches):
                 my_demands[i] = f"{DPlayer().get_object_by_key(m.player_keys[0]).complete_name} - "\

@@ -4,6 +4,8 @@ from os import getcwd
 from sys import path
 path.insert(1, getcwd())
 
+from operator import attrgetter
+
 from controller.controlbase import ControllerBase
 from controller.controlround import ControllerRound
 
@@ -43,10 +45,15 @@ class ControllerTournament(ControllerBase):
         text += f"Contrôle du temps : {tournament.time_control}\n"
         text += f"Description : {tournament.description}"
         self.titles.update_subtitle(text, SubtitleLevel.THIRD)
-
-        # --
         self.view_menu.print_titles()
-        self.view_menu.print_text("Classement :", ask_to_continue=False)
+
+        # Players
+        self.view_menu.print_text("** Participants **\n", ask_to_continue=False)
+        self.view_menu.print_text(self.players_list(tournament))
+        self.view_menu.print_separator()
+
+        # Ranking
+        self.view_menu.print_text("** Classement **\n", ask_to_continue=False)
         self.view_menu.print_text(self.tournament_ranking(tournament))
         self.view_menu.print_separator()
 
@@ -57,15 +64,29 @@ class ControllerTournament(ControllerBase):
                 
                 my_round = DRound().get_object_by_key(round_key)
                 text = str()
-                text += f"{my_round.name}\n"
+                text += f"** {my_round.name} **\n"
                 if my_round.datetime_end != None:
-                    text += f"{my_round.datetime_start} - {my_round.datetime_end}"
+                    text += f"** Du {my_round.datetime_start} au {my_round.datetime_end} **"
                 else:
-                    text += f"{my_round.datetime_start} - (round en cours)"
+                    text += f"** Du {my_round.datetime_start} au (round en cours) **"
 
                 self.view_menu.print_text(text, ask_to_continue=False)
                 self.view_menu.print_text(self.controller_round.abstract_round(my_round))
                 self.view_menu.print_separator()
+
+    def players_list(self, tournament):
+        """ Return a text with the name of players in the tournament """
+        players = []
+        for k in tournament.players.keys():
+            players.append(DPlayer().get_object_by_key(k))
+
+        players.sort(key=attrgetter("name", "last_name"))
+
+        txt = str()
+        for p in players:
+            txt += f"{p.complete_name}\n"
+
+        return txt
 
     def tournament_ranking(self, tournament):
         """ Return a text with the current ranking.
@@ -115,11 +136,12 @@ class ControllerTournament(ControllerBase):
                              my_demands['description']['value'])
 
             self.view_form.print_titles(True)
-            if new_tournament in DTournament().get_all_objects([]):
+            if new_tournament in DTournament().get_all_objects():
                 self.view_form.print_text(f"Le tournoi {new_tournament.name} de "\
                                           f"{new_tournament.place} exite déjà")
             else:
                 DTournament().add_object(new_tournament)
+                self.view_form.print_line_break()
                 self.view_form.print_text(f"Nouveau tournoi ajouté :\n{new_tournament}")
                 return new_tournament
 
@@ -135,16 +157,4 @@ class ControllerTournament(ControllerBase):
         # Form filled by user (return user's choices in a list)
         tournament_selected_in_form = self.view_menu.show_menu(my_demands, number_of_choices=1)
         return tournaments_list[tournament_selected_in_form]
-
-    def list_tournament(self, sorted_by=["name"]):
-        """ Show all tournaments sorted with the keys in 'sorted_by' """
-
-        tournaments = DTournament().get_all_objects(sorted_by)
-
-        text = str()
-        for t in tournaments:
-            text += f" - {t}\n"
-
-        self.view_form.print_titles(True)
-        self.view_form.print_text(text)
 

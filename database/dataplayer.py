@@ -21,13 +21,11 @@ class DPlayer(DBase):
         my_player.unserialize(super()._dict_by_key(key))
         return my_player 
 
-    def get_all_objects(self, sorted_by=["last_name", "name", "rank"]):
-        """ Return a list with all players saved
-            Sorted with a list of the dictionary's keys """
-        dict_list = super()._all_dicts(sorted_by)
+    def get_all_objects(self):
+        """ Return the list of all MPlayer saved in database """
 
         players_list = []
-        for elem in dict_list:
+        for elem in self.data_base.all():
             my_player = MPlayer()
             my_player.unserialize(elem)
             players_list.append(my_player)
