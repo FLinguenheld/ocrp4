@@ -1,6 +1,6 @@
 # ocrp4
-OpenClassRooms Projet 2  
-Développez un programme logiciel en Python  
+OpenClassRooms Projet 4  
+Développez un programme logiciel en Python - ChessManager  
 
 ![Logo FLinguenheld](https://github.com/FLinguenheld/OpenCR_P2/blob/main/Forelif.png "Pouet")
 ****
