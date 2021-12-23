@@ -84,37 +84,25 @@ class ControllerMenuTournament(ControllerMenuBase):
         self.view_menu.print_text(f"Création du round : ** {new_round.name} **", center=True)
 
     def show_new_tournament(self):
-        """ Show menu to create a new tournament then launches the
+        """ Shows menu to create a new tournament then launches the
             tournament in progress method """
 
-        # Enough players (eight today 21/12/2021) ?
-        if len(DPlayer().get_all_objects()) <= 8:
+        # Enough players
+        if not DPlayer().get_all_objects():
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             self.view_menu.print_titles()
             self.view_menu.print_line_break()
-            self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "
-                                      "pouvoir créer un nouveau tournoi.")
+            self.view_menu.print_text("La base de données ne contient aucun joueur.")
             return None
 
         else:
-            # Create tournament and select 8 players
+            # Create tournament
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             my_tournament = self.controller_tournament.create_tournament()
 
-            self.titles.update_subtitle(f"Création du tournoi : {my_tournament.name}",
-                                        SubtitleLevel.FIRST)
-            self.titles.update_subtitle(f"Selectionner {my_tournament.number_of_players} joureurs",
-                                        SubtitleLevel.SECOND)
-            player_keys = self.controller_player.selection_player(my_tournament.number_of_players)
-
-            # Save player keys and init their points {'player_key':points}
-            for p in player_keys:
-                my_tournament.players[p] = 0
-
-            DTournament().update_object(my_tournament)
-
-            # Launch the progress menu with the new tournament
-            self.show_tournament_in_progress(my_tournament.key)
+            # Adds players, if ok, launches the progress menu tournament
+            if self._add_players(my_tournament):
+                self.show_tournament_in_progress(my_tournament.key)
 
     def show_resume_tournament(self):
         """ Search active tournaments and allow to select one.
@@ -141,5 +129,41 @@ class ControllerMenuTournament(ControllerMenuBase):
             selected_tournament = self.controller_tournament.selection_tournament(
                 tournaments_active)
 
+            # Checks if players were selected, if not launches _add_players()
+            if not selected_tournament.players:
+                if not self._add_players(selected_tournament):
+                    return None
+
             # Launch the progress menu
             self.show_tournament_in_progress(selected_tournament.key)
+
+    def _add_players(self, tournament):
+        """ Checks the number of players in the database and asks to user to select
+            the number of players saved in the tournament model
+            Then, saved the modification.
+            Return True if adding is ok """
+
+        self.titles.update_subtitle(f"Création du tournoi : {tournament.name}",
+                                    SubtitleLevel.FIRST)
+
+        # Checks if there are enough players
+        if len(DPlayer().get_all_objects()) < tournament.number_of_players:
+            self.view_menu.print_titles()
+            self.view_menu.print_line_break()
+            self.view_menu.print_text(f"La base de données ne contient pas assez de joueurs :\n"
+                                      f"{tournament.number_of_players} joueurs nécessaires pour "
+                                      f"{len(DPlayer().get_all_objects())} joueurs disponibles")
+            return False
+
+        else:
+            self.titles.update_subtitle(f"Selectionner {tournament.number_of_players} joureurs",
+                                        SubtitleLevel.SECOND)
+            # Ask to user
+            player_keys = self.controller_player.selection_player(tournament.number_of_players)
+
+            # Saves players keys and init their points {'player_key':points}
+            for p in player_keys:
+                tournament.players[p] = 0
+
+            DTournament().update_object(tournament)
+            return True

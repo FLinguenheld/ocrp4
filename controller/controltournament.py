@@ -39,7 +39,7 @@ class ControllerTournament(ControllerBase):
         # -−
         text = f"Du {tournament.date_start} au {tournament.date_end}\n"
         text += f"Ville : {tournament.place}\n"
-        text += f"Nombre de joueurs : {tournament.number_of_players}"
+        text += f"Nombre de joueurs : {tournament.number_of_players}\n"
         text += f"Nombre de rounds : {tournament.number_of_rounds}\n"
         text += f"Contrôle du temps : {tournament.time_control}\n"
         text += f"Description : {tournament.description}"

@@ -47,6 +47,9 @@ class ControllerMenuPlayer(ControllerMenuBase):
 
                 self.controller_player.create_player()
 
+            elif choice == 7:
+                return None
+
             elif self._check_if_players():
 
                 if choice == 2:
@@ -97,9 +100,6 @@ class ControllerMenuPlayer(ControllerMenuBase):
                     players.sort(key=lambda k: k.name.lower(), reverse=False)
 
                     self._show_list(players)
-
-            else:
-                return None
 
     def _show_list(self, players):
         """ Print titles and list given """
