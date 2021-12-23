@@ -81,6 +81,3 @@ Cet environnement contient le module flake8. Pour générer un nouveau rapport h
 
 Rendez-vous ensuite dans le dossier __flake8_rapport__ et ouvrez le fichier __index.html__ dans votre navigateur web pour afficher  
 les résultats du contrôle.
-****
-
-![Logo FLinguenheld](https://raw.githubusercontent.com/FLinguenheld/ocrp4/main/Forelif.png "Pouet")
