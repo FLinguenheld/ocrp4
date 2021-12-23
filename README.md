@@ -2,7 +2,9 @@
 OpenClassRooms Projet 4  
 Développez un programme logiciel en Python - ChessManager  
 
-![Logo FLinguenheld](https://github.com/FLinguenheld/OpenCR_P2/blob/main/Forelif.png "Pouet")
+![Logo](https://raw.githubusercontent.com/FLinguenheld/ocrp4/main/Logo.png "Chess")
+![Logo FLinguenheld](https://raw.githubusercontent.com/FLinguenheld/ocrp4/main/Forelif.png "Pouet")
+
 ****
 ### Installation
 Rendez vous dans le dossier de votre choix puis lancez un terminal.  
@@ -79,3 +81,6 @@ Cet environnement contient le module flake8. Pour générer un nouveau rapport h
 
 Rendez-vous ensuite dans le dossier __flake8_rapport__ et ouvrez le fichier __index.html__ dans votre navigateur web pour afficher  
 les résultats du contrôle.
+****
+
+![Logo FLinguenheld](https://raw.githubusercontent.com/FLinguenheld/ocrp4/main/Forelif.png "Pouet")
