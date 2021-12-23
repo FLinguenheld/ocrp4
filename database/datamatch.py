@@ -5,7 +5,7 @@ from sys import path
 path.insert(1, getcwd())
 
 from database.database import DBase
-from model.modelmatch import MMatch 
+from model.modelmatch import MMatch
 
 
 class DMatch(DBase):
@@ -28,8 +28,3 @@ class DMatch(DBase):
             my_matches.append(self.get_object_by_key(k))
 
         return my_matches
-
-
-if __name__ == "__main__":
-    pass
-

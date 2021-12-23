@@ -19,10 +19,11 @@ class VMenu(VBase):
 
             1 - Choice 1
             2 - Choice 2
-            
+
             3 - Choice 3
-        …
+            …
     """
+
     def __init__(self, titles):
         super().__init__(titles)
         self.menu = _Menu(titles.length, self.STARS_NUMBER)
@@ -30,10 +31,10 @@ class VMenu(VBase):
     def show_menu(self, choices, number_of_choices=1):
         """ Show a menu, wait and return the user's choice (int).
             choices (dict{int:str}) : Represent the possibilities (see Menu class for details)
-            
+
             Retun a list with the choices (int)
             or just an int if only one choice asked """
-       
+
         user_choices = []
         self.menu.update_choices(choices)
         self._refresh()
@@ -42,25 +43,23 @@ class VMenu(VBase):
 
             while True:
                 try:
-                    if number_of_choices == 1 :
-                        question = self.line.formated_text_only_left_side(
-                                                        self.STARS_NUMBER,
-                                                        "Sélection ? > ")
+                    if number_of_choices == 1:
+                        question = self.line.formated_text_only_left_side(self.STARS_NUMBER,
+                                                                          "Sélection ? > ")
                     else:
-                        question = self.line.formated_text_only_left_side(
-                                                        self.STARS_NUMBER,
-                                f"Sélection {i}/{number_of_choices} ? > ")
+                        question = self.line.formated_text_only_left_side(self.STARS_NUMBER,
+                                                                          f"Sélection {i}/{number_of_choices} ? > ")
 
                     current_choice = int(input(question))
 
                     if isinstance(current_choice, int) and current_choice in self.menu:
                         user_choices.append(current_choice)
 
-                        # Change the selected key in float 
+                        # Change the selected key in float
                         # (it will print with an other style by _Menu)
-                        self.menu.choices = {float(current_choice)
-                                                if k == current_choice
-                                                else k:v for k, v in self.menu.choices.items()}
+                        self.menu.choices = {
+                            float(current_choice) if k == current_choice else k: v for k,
+                            v in self.menu.choices.items()}
                         self._refresh()
                         break
                     else:
@@ -68,10 +67,10 @@ class VMenu(VBase):
 
                 except KeyboardInterrupt:
                     exit()
-                except:
+                except BaseException:
                     self._refresh()
                     print(self.line.formated_text_only_left_side(self.STARS_NUMBER,
-                                                f"Ce choix n'est pas possible"))
+                                                                 "Ce choix n'est pas possible"))
 
         if number_of_choices == 1:
             return user_choices[0]
@@ -85,6 +84,7 @@ class VMenu(VBase):
         self.menu.print()
         super().print_line_break()
 
+
 class _Menu:
     """ Allow to create a menu in terminal.
         Use update_choices() to create a new menu and print to show the menu
@@ -94,6 +94,7 @@ class _Menu:
         and int are print normaly.
         See VMenu to read an exemple for the dictionary 'choices'
     """
+
     def __init__(self, line_length, stars_number):
         self.choices = {}
         self.line = _Line(line_length)
@@ -110,7 +111,6 @@ class _Menu:
                 print(self.line.format_text(self.STARS_NUMBER, f"{k} : {v}", False))
 
             elif isinstance(k, float):
-                txt = f"     -> {int(k)} : {v}"
                 print(self.line.format_text(self.STARS_NUMBER, f"     -> {int(k)} : {v}", False))
 
             else:
@@ -120,14 +120,14 @@ class _Menu:
         """ Allow to use = to check if index (int) exists in self.choices' keys
             Ignore all non-int keys """
         keys_int_only = [k for k in self.choices.keys() if isinstance(k, int)]
-        return isinstance(index, int) and index in keys_int_only 
+        return isinstance(index, int) and index in keys_int_only
 
 
 if __name__ == "__main__":
 
     my_titles = Title("Super titre !!!!!")
     my_titles.update_subtitle("Sous titre encore mieux")
-    my_choices = {1:"Choix 1", 2:"Choix 2", "a":None, 3:"Choix 3", "b":None, 4:"Choix 4"}
+    my_choices = {1: "Choix 1", 2: "Choix 2", "a": None, 3: "Choix 3", "b": None, 4: "Choix 4"}
 
     test = VMenu(my_titles)
     user_choices = test.show_menu(my_choices, 3)

@@ -21,14 +21,14 @@ class ControllerPlayer(ControllerBase):
 
     def create_player(self):
         """ Create a player in database.
-            Show a form and check if new player already exists. 
+            Show a form and check if new player already exists.
             Then save in database and return the new player """
 
         new_player = self._form_player()
         DPlayer().add_object(new_player)
 
         self.view_form.print_line_break()
-        self.view_form.print_text(f"Nouveau joueur ajouté :\n" \
+        self.view_form.print_text(f"Nouveau joueur ajouté:\n"
                                   f"  ** {new_player}")
         return new_player
 
@@ -42,9 +42,9 @@ class ControllerPlayer(ControllerBase):
         DPlayer().update_object(updated_player)
 
         self.view_form.print_line_break()
-        self.view_form.print_text(f"Le joueur :\n  ** {player}", ask_to_continue=False)
+        self.view_form.print_text(f"Le joueur:\n  ** {player}", ask_to_continue=False)
         self.view_form.print_line_break()
-        self.view_form.print_text(f"a été remplacé par :\n  ** {updated_player}")
+        self.view_form.print_text(f"a été remplacé par:\n  ** {updated_player}")
         return updated_player
 
     def _form_player(self, player=None):
@@ -58,37 +58,32 @@ class ControllerPlayer(ControllerBase):
             if player is None:
                 player = MPlayer()
 
-            my_demands = {"name" :
-                                {"name" : "Prénom",
-                                 "format" : FormatData.STR,
-                                 "value" : player.name},
-                          "last_name" :
-                                {"name" : "Nom",
-                                 "format" : FormatData.STR,
-                                 "value" : player.last_name},
-                          "birth" :
-                                {"name" : "Date de naissance",
-                                 "format" : FormatData.DATE,
-                                 "value" : player.birth},
-                          "sex" :
-                                {"name" : "Sexe",
-                                 "format" : FormatData.LIST,
-                                 "choices" : ("Masculin", "Féminin"),
-                                 "value" : player.sex}}
+            my_demands = {"name": {"name": "Prénom",
+                                   "format": FormatData.STR,
+                                   "value": player.name},
+                          "last_name": {"name": "Nom",
+                                        "format": FormatData.STR,
+                                        "value": player.last_name},
+                          "birth": {"name": "Date de naissance",
+                                    "format": FormatData.DATE,
+                                    "value": player.birth},
+                          "sex": {"name": "Sexe",
+                                  "format": FormatData.LIST,
+                                  "choices": ("Masculin", "Féminin"),
+                                  "value": player.sex}}
 
-           # Show form and create a player with new values
+            # Show form and create a player with new values
             my_demands = self.view_form.show_form(my_demands)
-            new_player = MPlayer(   player.key,
-                                    my_demands['name']['value'],
-                                    my_demands['last_name']['value'],
-                                    my_demands['birth']['value'],
-                                    my_demands['sex']['value'],
-                                    player.rank)
+            new_player = MPlayer(player.key,
+                                 my_demands['name']['value'],
+                                 my_demands['last_name']['value'],
+                                 my_demands['birth']['value'],
+                                 my_demands['sex']['value'],
+                                 player.rank)
 
             self.view_form.print_titles(clear_before=True)
             if new_player in DPlayer().get_all_objects():
-                self.view_form.print_text(
-                                    f"Le joueur {new_player.complete_name} exite déjà")
+                self.view_form.print_text(f"Le joueur {new_player.complete_name} exite déjà")
             else:
                 return new_player
 
@@ -99,8 +94,8 @@ class ControllerPlayer(ControllerBase):
 
         players = DPlayer().get_all_objects()
         players.sort(key=attrgetter("rank"), reverse=True)
-        players.sort(key=lambda k:k.name.lower(), reverse=False)
-        players.sort(key=lambda k:k.last_name.lower(), reverse=False)
+        players.sort(key=lambda k: k.name.lower(), reverse=False)
+        players.sort(key=lambda k: k.last_name.lower(), reverse=False)
 
         # Demands for the form
         my_demands = dict()
@@ -119,4 +114,3 @@ class ControllerPlayer(ControllerBase):
                 players_selected_keys_in_db.append(players[i].key)
 
             return players_selected_keys_in_db
-    

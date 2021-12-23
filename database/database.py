@@ -1,13 +1,11 @@
 #! env/bin/python3
 """ Base for datbases with TinyDB, regroups main attributes and methods """
-from os import getcwd
+import os
 from sys import path
-path.insert(0, getcwd())
+path.insert(0, os.getcwd())
 
 from tinydb import TinyDB, Query
 from random import randint
-
-from model.modelbase import MBase
 
 
 class DBase:
@@ -15,13 +13,13 @@ class DBase:
         Allow to save, search, create… """
 
     def __init__(self, database_name):
-        self.data_base = TinyDB(database_name)
+        self.data_base = TinyDB("sauvegardes" + os.sep + database_name)
         self.query = Query()
 
     def add_object(self, obj):
         """ Create and serialize the new match.
         Return the key generated for the new match """
- 
+
         obj.key = self._generate_key()
         self.data_base.insert(obj.serialize())
         return obj.key
@@ -46,7 +44,3 @@ class DBase:
         results = self.data_base.search(self.query.key == key)
         if results:
             return results[0]
-
-if __name__ == "__main__":
-    pass
-

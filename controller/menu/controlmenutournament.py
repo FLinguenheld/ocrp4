@@ -15,9 +15,6 @@ from controller.controlround import ControllerRound
 
 from view.viewbase import SubtitleLevel
 
-from model.modeltournament import MTournament
-from model.modelplayer import MPlayer
-
 from database.datatournament import DTournament
 from database.dataround import DRound
 from database.dataplayer import DPlayer
@@ -35,7 +32,7 @@ class ControllerMenuTournament(ControllerMenuBase):
 
     def show_tournament_in_progress(self, tournament_key):
         """ Main method, resume and manages the tournament, creates rounds and launches menus """
-        
+
         while True:
             # here to refresh the object
             my_tournament = DTournament().get_object_by_key(tournament_key)
@@ -48,7 +45,7 @@ class ControllerMenuTournament(ControllerMenuBase):
                 last_round = DRound().get_object_by_key(my_tournament.round_keys[-1])
 
                 # Last round finished
-                if last_round.datetime_end != None:
+                if last_round.datetime_end is not None:
 
                     if len(my_tournament.round_keys) < my_tournament.number_of_rounds:
                         self._new_round(my_tournament, my_tournament.round_keys)
@@ -95,14 +92,14 @@ class ControllerMenuTournament(ControllerMenuBase):
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
             self.view_menu.print_titles()
             self.view_menu.print_line_break()
-            self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "\
-                                       "pouvoir créer un nouveau tournoi.")
+            self.view_menu.print_text("Le nombre de joueurs est insuffisant pour "
+                                      "pouvoir créer un nouveau tournoi.")
             return None
 
         else:
             # Create tournament and select 8 players
             self.titles.update_subtitle("Création d'un tournoi", SubtitleLevel.FIRST)
-            my_tournament = self.controller_tournament.create_tournament()            
+            my_tournament = self.controller_tournament.create_tournament()
 
             self.titles.update_subtitle(f"Création du tournoi : {my_tournament.name}",
                                         SubtitleLevel.FIRST)
@@ -127,7 +124,7 @@ class ControllerMenuTournament(ControllerMenuBase):
         # Search active tournaments
         tournaments_active = []
         for t in tournaments:
-            if t.ended == False:
+            if not t.ended:
                 tournaments_active.append(t)
 
         if not tournaments_active:
@@ -142,8 +139,7 @@ class ControllerMenuTournament(ControllerMenuBase):
             # Sort by date and ask selection
             tournaments_active.sort(key=attrgetter("date"), reverse=True)
             selected_tournament = self.controller_tournament.selection_tournament(
-                                    tournaments_active)
-            
+                tournaments_active)
+
             # Launch the progress menu
             self.show_tournament_in_progress(selected_tournament.key)
-

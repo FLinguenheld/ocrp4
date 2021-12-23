@@ -7,15 +7,15 @@ path.insert(1, getcwd())
 from datetime import date
 
 from model.modelbase import MBase
- 
+
 
 class MTournament(MBase):
 
     def __init__(self, key=0, name="", place="", date_start=None, date_end=None,
-                number_of_players=8, number_of_rounds=4, time_control="", description=""):
+                 number_of_players=8, number_of_rounds=4, time_control="", description=""):
         super().__init__(key, name)
         self.place = place
-        self.date_start = date_start 
+        self.date_start = date_start
         self.date_end = date_end
         self.number_of_players = number_of_players
         self.number_of_rounds = number_of_rounds
@@ -32,23 +32,22 @@ class MTournament(MBase):
         day = int(my_date[0])
         month = int(my_date[1])
         year = int(my_date[2])
-        
-        return date(year, month, day)
 
+        return date(year, month, day)
 
     def __str__(self):
         return f"{self.name}"\
-        f" de {self.place}"\
-        f" - du {self.date_start}"\
-        f" au {self.date_end}"
+            f" de {self.place}"\
+            f" - du {self.date_start}"\
+            f" au {self.date_end}"
 
     def __repr__(self):
         return f"Tournoi :"\
-        f" key : {self.key}"\
-        f" nom : {self.name}"\
-        f" round_keys : {self.round_keys}"\
-        f" players : {self.players}"\
-        f" ended : {self.ended}"
+            f" key : {self.key}"\
+            f" nom : {self.name}"\
+            f" round_keys : {self.round_keys}"\
+            f" players : {self.players}"\
+            f" ended : {self.ended}"
 
     def serialize(self):
         dict_to_serialize = super().serialize()
@@ -100,7 +99,7 @@ class MTournament(MBase):
 
     def __sort_dict(self, players_list):
         """ Sort players by points before save """
-        return dict(sorted(players_list.items(), key=lambda item:item[1], reverse=True))
+        return dict(sorted(players_list.items(), key=lambda item: item[1], reverse=True))
 
 
 if __name__ == "__main__":

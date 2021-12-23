@@ -9,11 +9,11 @@ from enum import Enum
 
 class SubtitleLevel(Enum):
     """ Values are used for the stars in texts """
-    FIRST=4
-    SECOND=3
-    THIRD=2
-    FOURTH=1
-    ALL=10
+    FIRST = 4
+    SECOND = 3
+    THIRD = 2
+    FOURTH = 1
+    ALL = 10
 
 
 class Title:
@@ -25,13 +25,14 @@ class Title:
           subtitle1
         *************
     """
+
     def __init__(self, title, line_length=100):
         self.title = title
         self.length = line_length
         self.line = _Line(line_length)
 
         self.separator = _Separator(line_length)
-        self.subtitles = {4:'', 3:'', 2:'', 1:''}
+        self.subtitles = {4: '', 3: '', 2: '', 1: ''}
 
         self.STARS_MULTIPLIER = 3
         self.STARS_NB_FOR_TITLE = 5
@@ -40,7 +41,7 @@ class Title:
         """ Update de subtitle text at the indicated level """
         if level != SubtitleLevel.ALL:
             self.subtitles[level.value] = text
-    
+
     def clear_subtitle(self, level=SubtitleLevel.FIRST):
         """ Clear the subtitle at the indicated level (All to complete clear) """
         if level == SubtitleLevel.ALL:
@@ -73,6 +74,7 @@ class Title:
 
 class _Line:
     """ Allow to format text with the same way in the terminal """
+
     def __init__(self, length):
         self.length = length
         self.TABULATION = 5
@@ -84,17 +86,17 @@ class _Line:
             You can use a text (with /n) or a list of string
         """
         formated_text = str()
-        for l in text.split("\n"):
+        for line in text.split("\n"):
             if center:
-                formated_text += "*" * stars_number 
-                formated_text += l.center(self.length - (stars_number * 2))
-                formated_text += "*" * stars_number 
+                formated_text += "*" * stars_number
+                formated_text += line.center(self.length - (stars_number * 2))
+                formated_text += "*" * stars_number
             else:
-                formated_text += "*" * stars_number 
-                formated_text += " " * self.TABULATION 
-                formated_text += l 
-                formated_text += " " * (self.length - len(l) - (stars_number * 2) - self.TABULATION)
-                formated_text += "*" * stars_number 
+                formated_text += "*" * stars_number
+                formated_text += " " * self.TABULATION
+                formated_text += line
+                formated_text += " " * (self.length - len(line) - (stars_number * 2) - self.TABULATION)
+                formated_text += "*" * stars_number
 
             formated_text += "\n"
 
@@ -103,12 +105,12 @@ class _Line:
 
     def formated_text_only_left_side(self, stars_number, text):
         """ Specific for input line """
-        formated_text =  "*" * stars_number 
-        formated_text += " " * self.TABULATION 
+        formated_text = "*" * stars_number
+        formated_text += " " * self.TABULATION
         formated_text += text
 
         return formated_text
-    
+
     def formated_jump(self, stars_number):
         """ Jump line with stars on both sides """
         return self.format_text(stars_number, " ", True)
@@ -118,10 +120,9 @@ class _Separator:
     """ Class to represent a separator (a stars line)
         Define the length in constructor and use print()
     """
+
     def __init__(self, length):
         self.length = length
 
     def __str__(self):
         return "*" * self.length
-
-

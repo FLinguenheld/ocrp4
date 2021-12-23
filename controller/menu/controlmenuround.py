@@ -24,8 +24,8 @@ class ControllerMenuRound(ControllerMenuBase):
 
     def show_menu_round(self, round_key, tournament_key):
         """ Show the menu of a round, allow to indicate score, validate round, and
-            show the classement. 
-            Subtitles are used to show the current matches results """    
+            show the classement.
+            Subtitles are used to show the current matches results """
 
         while True:
             my_tournament = DTournament().get_object_by_key(tournament_key)
@@ -37,13 +37,13 @@ class ControllerMenuRound(ControllerMenuBase):
                                         SubtitleLevel.THIRD)
             self.titles.clear_subtitle(SubtitleLevel.FOURTH)
 
-            my_demands = {1:"Renseigner résultat",
-                          2:"Valider round",
-                         'a':None,
-                          3:"Afficher le classement en cours",
-                          4:"Afficher l'historique du tournoi",
-                         'b':None,
-                          5:"Quitter"}
+            my_demands = {1: "Renseigner résultat",
+                          2: "Valider round",
+                          'a': None,
+                          3: "Afficher le classement en cours",
+                          4: "Afficher l'historique du tournoi",
+                          'b': None,
+                          5: "Quitter"}
 
             choice = self.view_menu.show_menu(my_demands)
 
@@ -59,14 +59,13 @@ class ControllerMenuRound(ControllerMenuBase):
                 self.view_menu.print_titles()
                 self.view_menu.print_line_break()
                 self.view_menu.print_text(
-                        self.controller_tournament.tournament_ranking(my_tournament))
+                    self.controller_tournament.tournament_ranking(my_tournament))
 
             elif choice == 4:
                 self.controller_tournament.abstract_tournament(my_tournament)
 
             else:
                 return "Quit"
-
 
     def _validate_round(self, round_key, tournament_key):
         """ Allow to validate round if matches are finished.
@@ -77,12 +76,12 @@ class ControllerMenuRound(ControllerMenuBase):
 
         # Check if all matches are complete
         for m in matches:
-            if m.winner == None:
+            if m.winner is None:
 
-                self.titles.update_subtitle(f"Validation du round", SubtitleLevel.FOURTH)
+                self.titles.update_subtitle("Validation du round", SubtitleLevel.FOURTH)
                 self.view_menu.print_titles()
                 self.view_menu.print_line_break()
-                self.view_menu.print_text("Tous les matchs doivent être terminés "\
+                self.view_menu.print_text("Tous les matchs doivent être terminés "
                                           "pour pouvoir valider le round.")
                 return None
 
@@ -102,12 +101,11 @@ class ControllerMenuRound(ControllerMenuBase):
         my_round.save_datetime_end()
         DRound().update_object(my_round)
 
-
     def _show_menu_scores(self, round_key):
         """ Show matches and allow to select one to complete the winner """
         while True:
             my_round = DRound().get_object_by_key(round_key)
-            
+
             self.titles.update_subtitle(self.controller_round.abstract_round(my_round),
                                         SubtitleLevel.THIRD)
             self.titles.update_subtitle("Sélectionner un match pour modifier le résultat",
@@ -131,4 +129,3 @@ class ControllerMenuRound(ControllerMenuBase):
                 my_controller_match.set_winner(matches[choice])
             else:
                 return None
-

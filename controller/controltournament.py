@@ -29,15 +29,15 @@ class ControllerTournament(ControllerBase):
 
         self.titles.clear_subtitle(SubtitleLevel.ALL)
         self.titles.update_subtitle(f"Tournoi : {tournament.name}", SubtitleLevel.FIRST)
-        
+
         # --
-        if tournament.ended == False:
+        if not tournament.ended:
             self.titles.update_subtitle("EN COURS", SubtitleLevel.SECOND)
         else:
             self.titles.update_subtitle("TERMINÉ", SubtitleLevel.SECOND)
 
         # -−
-        text =  f"Du {tournament.date_start} au {tournament.date_end}\n"
+        text = f"Du {tournament.date_start} au {tournament.date_end}\n"
         text += f"Ville : {tournament.place}\n"
         text += f"Nombre de joueurs : {tournament.number_of_players}"
         text += f"Nombre de rounds : {tournament.number_of_rounds}\n"
@@ -60,11 +60,11 @@ class ControllerTournament(ControllerBase):
         if tournament.round_keys:
 
             for round_key in tournament.round_keys:
-                
+
                 my_round = DRound().get_object_by_key(round_key)
                 text = str()
                 text += f"** {my_round.name} **\n"
-                if my_round.datetime_end != None:
+                if my_round.datetime_end is not None:
                     text += f"** Du {my_round.datetime_start} au {my_round.datetime_end} **"
                 else:
                     text += f"** Du {my_round.datetime_start} au (round en cours) **"
@@ -79,8 +79,8 @@ class ControllerTournament(ControllerBase):
         for k in tournament.players.keys():
             players.append(DPlayer().get_object_by_key(k))
 
-        players.sort(key=lambda k:k.last_name.lower(), reverse=False)
-        players.sort(key=lambda k:k.name.lower(), reverse=False)
+        players.sort(key=lambda k: k.last_name.lower(), reverse=False)
+        players.sort(key=lambda k: k.name.lower(), reverse=False)
 
         txt = str()
         for p in players:
@@ -113,40 +113,40 @@ class ControllerTournament(ControllerBase):
         """ Create and show a form. User fill it and a new tournament is created in the data base
             Return the instance of the new object created """
 
-        my_demands = {"name" :
-                {"name" : "Nom du tournoi", "format" : FormatData.STR},
-                      "place" :
-                {"name" : "Ville", "format" : FormatData.STR},
-                      "date_start" :
-                {"name" : "Date de début", "format" : FormatData.DATE},
-                      "date_end" :
-                {"name" : "Date de fin", "format" : FormatData.DATE},
-                      "number_of_players" :
-                {"name" : "Nombre de joueurs", "format" : FormatData.LISTINT, "choices" : [8, 10]},
-                      "number_of_rounds" :
-                {"name" : "Nombre de rounds", "format" : FormatData.LISTINT, "choices" : [4, 6]},
-                      "time_control" :
-                {"name" : "Contrôle du temps", "format" : FormatData.LIST,
-                                               "choices" : ("Bullet", "Blitz", "Coup rapide")},
-                      "description" :
-                {"name" : "Description", "format" : FormatData.STR}}
+        my_demands = {"name":
+                      {"name": "Nom du tournoi", "format": FormatData.STR},
+                      "place":
+                      {"name": "Ville", "format": FormatData.STR},
+                      "date_start":
+                      {"name": "Date de début", "format": FormatData.DATE},
+                      "date_end":
+                      {"name": "Date de fin", "format": FormatData.DATE},
+                      "number_of_players":
+                      {"name": "Nombre de joueurs", "format": FormatData.LISTINT, "choices": [8, 10]},
+                      "number_of_rounds":
+                      {"name": "Nombre de rounds", "format": FormatData.LISTINT, "choices": [4, 6]},
+                      "time_control":
+                      {"name": "Contrôle du temps", "format": FormatData.LIST,
+                          "choices": ("Bullet", "Blitz", "Coup rapide")},
+                      "description":
+                      {"name": "Description", "format": FormatData.STR}}
 
         while True:
             # Ask each demands by ViewForm then create a tournament with user's values
             my_demands = self.view_form.show_form(my_demands)
             new_tournament = MTournament(0,
-                             my_demands['name']['value'],
-                             my_demands['place']['value'],
-                             my_demands['date_start']['value'],
-                             my_demands['date_end']['value'],
-                             my_demands['number_of_players']['value'],
-                             my_demands['number_of_rounds']['value'],
-                             my_demands['time_control']['value'],
-                             my_demands['description']['value'])
+                                         my_demands['name']['value'],
+                                         my_demands['place']['value'],
+                                         my_demands['date_start']['value'],
+                                         my_demands['date_end']['value'],
+                                         my_demands['number_of_players']['value'],
+                                         my_demands['number_of_rounds']['value'],
+                                         my_demands['time_control']['value'],
+                                         my_demands['description']['value'])
 
             self.view_form.print_titles(True)
             if new_tournament in DTournament().get_all_objects():
-                self.view_form.print_text(f"Le tournoi {new_tournament.name} de "\
+                self.view_form.print_text(f"Le tournoi {new_tournament.name} de "
                                           f"{new_tournament.place} exite déjà")
             else:
                 DTournament().add_object(new_tournament)
@@ -166,4 +166,3 @@ class ControllerTournament(ControllerBase):
         # Form filled by user (return user's choices in a list)
         tournament_selected_in_form = self.view_menu.show_menu(my_demands, number_of_choices=1)
         return tournaments_list[tournament_selected_in_form]
-

@@ -13,7 +13,6 @@ from database.dataround import DRound
 from database.datamatch import DMatch
 from database.dataplayer import DPlayer
 
-from copy import deepcopy
 
 class ControllerRound(ControllerBase):
     """ Regroup main methods to manage model and database rounds """
@@ -49,7 +48,7 @@ class ControllerRound(ControllerBase):
         # Get previous matches played in all previous rounds
         previous_matches = self._get_all_previous_matches(previous_rounds_keys)
 
-         # Get MPlayers and sort players by points
+        # Get MPlayers and sort players by points
         my_players = self._sort_players(players_key_points)
         matchs_keys = []
 
@@ -85,7 +84,7 @@ class ControllerRound(ControllerBase):
         new_round = MRound(0, name, matchs_keys)
         new_round.save_datetime_start()
         DRound().add_object(new_round)
-        return new_round       
+        return new_round
 
     def _get_all_previous_matches(self, previous_rounds_keys):
         """ Return a list with all previous matches played during all previous
@@ -96,11 +95,11 @@ class ControllerRound(ControllerBase):
             my_round = DRound().get_object_by_key(round_key)
             previous_matches_keys += my_round.match_keys
 
-        # Loop in matches 
+        # Loop in matches
         previous_matches = []
         for match_key in previous_matches_keys:
             previous_matches.append(DMatch().get_object_by_key(match_key))
-    
+
         return previous_matches
 
     def _sort_players(self, players):
@@ -114,8 +113,7 @@ class ControllerRound(ControllerBase):
 
             my_players_list.append(my_player)
 
-        my_players_list.sort(key=lambda p:p.rank, reverse=True)
-        my_players_list.sort(key=lambda p:p.points, reverse=True)
+        my_players_list.sort(key=lambda p: p.rank, reverse=True)
+        my_players_list.sort(key=lambda p: p.points, reverse=True)
 
         return my_players_list
-

@@ -6,9 +6,6 @@ path.insert(1, getcwd())
 
 from controller.controlbase import ControllerBase
 
-from model.modelmatch import MMatch
-from model.modelplayer import MPlayer
-
 from database.datamatch import DMatch
 from database.dataplayer import DPlayer
 
@@ -28,11 +25,12 @@ class ControllerMatch(ControllerBase):
         player2 = DPlayer().get_object_by_key(match.player_keys[1])
 
         # Form
-        my_demands = {1:f"{player1}", 2:f"{player2}",
-                     'a':None,
-                      3:"Égalité",
-                     'b':None,
-                      4:"En cours"}
+        my_demands = {1: f"{player1}",
+                      2: f"{player2}",
+                      'a': None,
+                      3: "Égalité",
+                      'b': None,
+                      4: "En cours"}
 
         winner_index = self.view_menu.show_menu(my_demands)
 
@@ -44,11 +42,10 @@ class ControllerMatch(ControllerBase):
             match.winner = player2.key
 
         elif winner_index == 3:
-            match.winner = 0 
+            match.winner = 0
 
         else:
             match.winner = None
 
         # Update database macth
         DMatch().update_object(match)
-

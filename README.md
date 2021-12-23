@@ -56,3 +56,31 @@ Ainsi que d'afficher leur liste avec différentes options de tri.
 
 Vous avez enfin la possibilité d'afficher le classement et le résumé de tous les matchs du tournoi en cours  
 ainsi que tous ceux terminés dans l'historique.
+****
+### Premiers pas
+Afin de pouvoir faire des essais lors de la première utilisation du programme, des joueurs et des tournois sont déjà exitants  
+dans la base de données.
+
+Si vous souhaitez les supprimer, vous pouvez réinitialiser les sauvegardes. Rendez-vous dans le dossier __sauvegardes__ puis  
+supprimez les fichiers suivants :
+
+- players.json
+- matchs.json
+- rounds.json
+- tournaments.json
+****
+### PEP 8
+L'ensemble du code est conforme aux directives PEP 8 comme indiqué dans le fichier html __/flake8_rapport/index.html__.
+
+Vous pouvez générer un nouveau rapport flake8 en suivant ces étapes :
+
+Ouvrez un terminal, rendez vous dans le dossier où vous avez rangé __chessManager.py__, puis activez l'environnement virtuel :
+>source env/bin/activate
+
+Cet environnement contient le module flake8. Pour générer un nouveau rapport html, exécutez la commande suivante :
+>flake8 --format=html --htmldir=flake8_rapport
+
+Rendez-vous ensuite dans le dossier __flake8_rapport__ et ouvrez le fichier __index.html__ dans votre navigateur web pour afficher  
+les résultats du contrôle.
+****
+### Premiers pas

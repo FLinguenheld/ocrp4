@@ -33,7 +33,7 @@ class VBase:
 
     def ask_confirmation(self, text):
         """ Clear the screen, print the titles and ask a confirmation
-            Retun a bool according the user's choice """ 
+            Retun a bool according the user's choice """
 
         while True:
             self.print_titles()
@@ -53,7 +53,7 @@ class VBase:
             - center (bool):            used to center the text """
 
         if isinstance(text, str):
-                print(self.line.format_text(self.STARS_NUMBER, text, center))
+            print(self.line.format_text(self.STARS_NUMBER, text, center))
         else:
             for t in text:
                 print(self.line.format_text(self.STARS_NUMBER, t, center))
@@ -61,8 +61,7 @@ class VBase:
         if ask_to_continue:
             self.print_line_break()
             input(self.line.formated_text_only_left_side(self.STARS_NUMBER,
-                                        "Appuyez sur une touche pour continuer..."))
-            #input("**     Appuyez sur une touche pour continuer...")
+                                                         "Appuyez sur une touche pour continuer..."))
 
     def clear_terminal(self):
         """ Clear the terminal """
@@ -105,4 +104,3 @@ if __name__ == "__main__":
 
     my_text_list = ["Et", "une", "bonne ou très bonne", "journée", "bien", "sûr"]
     my_view.print_text(my_text_list, True, True)
-

@@ -5,10 +5,10 @@ from sys import path
 path.insert(1, getcwd())
 
 from view.viewform import VForm
-from view.viewform import FormatData
 from view.viewmenu import VMenu
 
 from controller.controltournament import ControllerTournament
+
 
 class ControllerMenuBase:
 
@@ -18,4 +18,3 @@ class ControllerMenuBase:
         self.view_menu = VMenu(self.titles)
 
         self.controller_tournament = ControllerTournament(self.titles)
-

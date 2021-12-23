@@ -19,7 +19,7 @@ class DTournament(DBase):
         """ Return MTournament object saved in the database with this key """
         my_tournament = MTournament()
         my_tournament.unserialize(super()._dict_by_key(key))
-        return my_tournament 
+        return my_tournament
 
     def get_all_objects(self):
         """ Return the list of all MTournament saved in database """
@@ -29,10 +29,9 @@ class DTournament(DBase):
             my_tournament = MTournament()
             my_tournament.unserialize(elem)
             tournaments_list.append(my_tournament)
-            
+
         return tournaments_list
 
 
 if __name__ == "__main__":
     pass
-

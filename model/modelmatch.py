@@ -16,13 +16,13 @@ class MMatch(MBase):
 
     def __str__(self):
         return f" player_keys : {self.player_keys}"\
-        f" winner : {self.winner}"
+            f" winner : {self.winner}"
 
     def __repr__(self):
         return f"Match:"\
-        f" key : {self.key}"\
-        f" player_keys : {self.player_keys}"\
-        f" winner : {self.winner}"
+            f" key : {self.key}"\
+            f" player_keys : {self.player_keys}"\
+            f" winner : {self.winner}"
 
     def serialize(self):
         dict_to_serialize = super().serialize()
@@ -37,11 +37,10 @@ class MMatch(MBase):
         self.winner = values["winner"]
 
     def __eq__(self, other_match):
-        """ Compare the players of two matches """ 
+        """ Compare the players of two matches """
         return sorted(self.player_keys) == sorted(other_match.player_keys)
 
 
 if __name__ == "__main__":
     my_match = MMatch(2415, [1021, 98543])
     print(my_match)
-

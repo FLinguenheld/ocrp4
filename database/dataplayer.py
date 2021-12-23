@@ -9,7 +9,7 @@ from model.modelplayer import MPlayer
 
 
 class DPlayer(DBase):
-    """ Database for players, create the file and specialised class 
+    """ Database for players, create the file and specialised class
         for MPlayer """
 
     def __init__(self):
@@ -19,7 +19,7 @@ class DPlayer(DBase):
         """ Return MPlayer object saved in the database with this key """
         my_player = MPlayer()
         my_player.unserialize(super()._dict_by_key(key))
-        return my_player 
+        return my_player
 
     def get_all_objects(self):
         """ Return the list of all MPlayer saved in database """
@@ -29,10 +29,5 @@ class DPlayer(DBase):
             my_player = MPlayer()
             my_player.unserialize(elem)
             players_list.append(my_player)
-            
+
         return players_list
-
-
-if __name__ == "__main__":
-    pass
-
