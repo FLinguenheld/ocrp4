@@ -68,7 +68,7 @@ supprimez les fichiers suivants :
 - tournaments.json
 ****
 ### PEP 8
-L'ensemble du code est conforme aux directives PEP 8 comme indiqué dans le fichier html :  
+L'ensemble du code est conforme aux directives PEP 8 comme indiqué dans le fichier html  
  __/flake8_rapport/index.html__.
 
 Vous pouvez générer un nouveau rapport flake8 en suivant ces étapes :
@@ -79,5 +79,5 @@ Ouvrez un terminal, rendez vous dans le dossier où vous avez rangé __chessMana
 Cet environnement contient le module flake8. Pour générer un nouveau rapport html, exécutez la commande :
 >flake8 --format=html --htmldir=flake8_rapport
 
-Rendez-vous ensuite dans le dossier __flake8_rapport__ et ouvrez le fichier __index.html__ dans votre navigateur web pour afficher  
+Rendez-vous ensuite dans le dossier __flake8_rapport__ et ouvrez le fichier __index.html__ dans votre navigateur web pour afficher 
 les résultats du contrôle.
