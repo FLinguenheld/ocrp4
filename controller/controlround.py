@@ -60,24 +60,25 @@ class ControllerRound(ControllerBase):
             second_list = my_players[middle_index:]
             second_list += first_list
 
-            # p1 with p2 exept is match already play with this two players
             p1 = first_list[0]
+            second_list.remove(p1)
+
+            # p1 with p2 exept is match already play with this two players
             for p2 in second_list:
 
-                if p1.key != p2.key:
-                    new_match = MMatch(0, [p1.key, p2.key])
+                new_match = MMatch(0, [p1.key, p2.key])
 
-                    # Already played ?
-                    if new_match not in previous_matches:
+                # Cheks if match already played or if it's the last player
+                if new_match not in previous_matches or len(second_list) == 1:
 
-                        # Create the match, save in database and add in the list
-                        new_match_key = DMatch().add_object(new_match)
-                        matchs_keys.append(new_match_key)
+                    # Create the match, save in database and add in the list
+                    new_match_key = DMatch().add_object(new_match)
+                    matchs_keys.append(new_match_key)
 
-                        # Remove players from list
-                        my_players.remove(p2)
-                        my_players.remove(p1)
-                        break
+                    # Remove players from list
+                    my_players.remove(p2)
+                    my_players.remove(p1)
+                    break
 
         # Create round, save in database and return the object
         name = "Round " + str(len(previous_rounds_keys) + 1)
