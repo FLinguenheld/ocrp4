@@ -74,32 +74,34 @@ class ControllerMenuRound(ControllerMenuBase):
         my_round = DRound().get_object_by_key(round_key)
         matches = DMatch().get_objects_by_keys(my_round.match_keys)
 
+        self.titles.update_subtitle("Validation du round", SubtitleLevel.FOURTH)
+
         # Check if all matches are complete
         for m in matches:
             if m.winner is None:
-
-                self.titles.update_subtitle("Validation du round", SubtitleLevel.FOURTH)
                 self.view_menu.print_titles()
                 self.view_menu.print_line_break()
                 self.view_menu.print_text("Tous les matchs doivent être terminés "
                                           "pour pouvoir valider le round.")
                 return None
 
-        # If ok, add points in tournament
-        my_tournament = DTournament().get_object_by_key(tournament_key)
-        for m in DMatch().get_objects_by_keys(my_round.match_keys):
+        # If ok, add points in tournament - Ask a confirmation before
+        if self.view_menu.ask_confirmation(f"Confirmer la validation du round {my_round.name} ?"):
 
-            if m.winner == 0:
-                my_tournament.players[m.player_keys[0]] += 0.5
-                my_tournament.players[m.player_keys[1]] += 0.5
-            else:
-                my_tournament.players[m.winner] += 1
+            my_tournament = DTournament().get_object_by_key(tournament_key)
+            for m in DMatch().get_objects_by_keys(my_round.match_keys):
 
-        DTournament().update_object(my_tournament)
+                if m.winner == 0:
+                    my_tournament.players[m.player_keys[0]] += 0.5
+                    my_tournament.players[m.player_keys[1]] += 0.5
+                else:
+                    my_tournament.players[m.winner] += 1
 
-        # Save the date of end
-        my_round.save_datetime_end()
-        DRound().update_object(my_round)
+            DTournament().update_object(my_tournament)
+
+            # Save the date of end
+            my_round.save_datetime_end()
+            DRound().update_object(my_round)
 
     def _show_menu_scores(self, round_key):
         """ Show matches and allow to select one to complete the winner """

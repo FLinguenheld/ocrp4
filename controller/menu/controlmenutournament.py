@@ -79,6 +79,7 @@ class ControllerMenuTournament(ControllerMenuBase):
         # Show a text to make a transition
         self.titles.clear_subtitle(SubtitleLevel.SECOND)
         self.titles.clear_subtitle(SubtitleLevel.THIRD)
+        self.titles.clear_subtitle(SubtitleLevel.FOURTH)
         self.view_menu.print_titles()
         self.view_menu.print_line_break()
         self.view_menu.print_text(f"Création du round : ** {new_round.name} **", center=True)

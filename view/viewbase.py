@@ -37,8 +37,11 @@ class VBase:
 
         while True:
             self.print_titles()
-            print(f"\n{text}\n")
-            answer = input(self.line.formated_text_only_left_side("Confirmer ? O/N > "))
+            self.print_line_break()
+            self.print_text(text, ask_to_continue=False)
+            self.print_line_break()
+            answer = input(self.line.formated_text_only_left_side(self.STARS_NUMBER,
+                                                                  "Confirmer ? O/N > "))
 
             if answer.upper() == "O" or answer.upper() == "OUI":
                 return True
