@@ -53,6 +53,7 @@ class ControllerMenuTournament(ControllerMenuBase):
                         # Tournament finished
                         # Show a text to make a transition
                         self.view_menu.print_titles()
+                        self.view_menu.print_line_break()
                         self.view_menu.print_text(f"Tounoi ** {my_tournament.name} ** terminé !")
 
                         # Save and show abstract
@@ -160,7 +161,17 @@ class ControllerMenuTournament(ControllerMenuBase):
             self.titles.update_subtitle(f"Selectionner {tournament.number_of_players} joureurs",
                                         SubtitleLevel.SECOND)
             # Ask to user
-            player_keys = self.controller_player.selection_player(tournament.number_of_players)
+            while True:
+                player_keys = self.controller_player.selection_player(tournament.number_of_players)
+
+                # Create a text to ask a confirmation
+                txt = "\n"
+                for k in player_keys:
+                    txt += DPlayer().get_object_by_key(k).complete_name + "\n"
+
+                self.titles.update_subtitle("Valider les joureurs", SubtitleLevel.SECOND)
+                if self.view_menu.ask_confirmation(txt):
+                    break
 
             # Saves players keys and init their points {'player_key':points}
             for p in player_keys:
