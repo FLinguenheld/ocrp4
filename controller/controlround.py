@@ -41,47 +41,58 @@ class ControllerRound(ControllerBase):
                             f"{DPlayer().get_object_by_key(m.winner).complete_name}\n"
         return abstract
 
-    def create_round(self, players_key_points={}, previous_rounds_keys=[]):
-        """ Create and save a round in the database
-            Manage the swiss system to create matches """
+    def create_first_round(self, players_key_points={}):
+        """ Create the first round with the swiss system """
 
-        # Get previous matches played in all previous rounds
+        # Gets MPlayers and sorts players by points
+        my_players = self._sort_players(players_key_points)
+        matchs_keys = []
+
+        middle_index = len(my_players) // 2
+        for p1, p2 in zip(my_players[:middle_index], my_players[middle_index:]):
+
+            # Create the match, save in database and add in the list
+            new_match_key = DMatch().add_object(MMatch(0, [p1.key, p2.key]))
+            matchs_keys.append(new_match_key)
+
+        # Create round, save in database and return the object
+        return self._add_round(matchs_keys)
+
+    def create_next_round(self, players_key_points={}, previous_rounds_keys=[]):
+        """ Create a round with the swiss system """
+
+        # Gets previous matches played in all previous rounds
         previous_matches = self._get_all_previous_matches(previous_rounds_keys)
 
-        # Get MPlayers and sort players by points
+        # Gets MPlayers and sort players by points
         my_players = self._sort_players(players_key_points)
         matchs_keys = []
 
         while my_players:
 
-            # Cut in two lists
-            middle_index = len(my_players) // 2
-            first_list = my_players[:middle_index]
-            second_list = my_players[middle_index:]
-            second_list += first_list
+            for i in range(1, len(my_players)):
+                new_match = MMatch(0, [my_players[0].key, my_players[i].key])
 
-            p1 = first_list[0]
-            second_list.remove(p1)
-
-            # p1 with p2 exept is match already play with this two players
-            for p2 in second_list:
-
-                new_match = MMatch(0, [p1.key, p2.key])
-
-                # Cheks if match already played or if it's the last player
-                if new_match not in previous_matches or len(second_list) == 1:
-
-                    # Create the match, save in database and add in the list
+                if new_match not in previous_matches or len(my_players) == 2:
                     new_match_key = DMatch().add_object(new_match)
                     matchs_keys.append(new_match_key)
 
-                    # Remove players from list
-                    my_players.remove(p2)
-                    my_players.remove(p1)
+                    my_players.remove(my_players[i])
+                    my_players.remove(my_players[0])
                     break
 
-        # Create round, save in database and return the object
-        name = "Round " + str(len(previous_rounds_keys) + 1)
+        # Creates round, saves in database and returns the object
+        return self._add_round(matchs_keys, previous_rounds_keys)
+
+    def _add_round(self, matchs_keys, previous_rounds_keys=None):
+        """ Add a round with a name and the date in the database.
+            Return the new round created """
+
+        if previous_rounds_keys is None:
+            name = "Round 1"
+        else:
+            name = "Round " + str(len(previous_rounds_keys) + 1)
+
         new_round = MRound(0, name, matchs_keys)
         new_round.save_datetime_start()
         DRound().add_object(new_round)

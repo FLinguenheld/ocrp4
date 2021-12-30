@@ -71,8 +71,11 @@ class ControllerMenuTournament(ControllerMenuBase):
         """ Private, create a new round with the controller round and
             save in the database """
 
-        new_round = self.controller_round.create_round(tournament.players,
-                                                       previous_rounds_keys)
+        if not previous_rounds_keys:
+            new_round = self.controller_round.create_first_round(tournament.players)
+        else:
+            new_round = self.controller_round.create_next_round(tournament.players,
+                                                                previous_rounds_keys)
 
         tournament.round_keys.append(new_round.key)
         DTournament().update_object(tournament)
